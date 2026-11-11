@@ -43,6 +43,13 @@ class MarketFilterComboBox(QComboBox):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.setPen(Qt.PenStyle.NoPen)
+        # Clear the native Qt theme's tiny yellow square before painting our
+        # single chevron. A flat inset patch preserves the rounded outer edge.
+        background = "#f3e5cb" if self.hasFocus() else (
+            "#f0e2c9" if self.underMouse() else "#e2d2b7"
+        )
+        painter.fillRect(self.width() - 28, 5, 22, max(0, self.height() - 10),
+                         QColor(background))
         painter.setBrush(QColor("#866342"))
         cx, cy = self.width() - 15, self.height() // 2
         painter.drawPolygon(QPolygon([
