@@ -8,7 +8,7 @@ on:
       - "v*"
 
 concurrency:
-  group: sami-albion-windows-release
+  group: sami-albion-windows-release-v046-unblock-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
