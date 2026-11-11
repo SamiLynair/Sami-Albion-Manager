@@ -115,10 +115,27 @@ class CalculatorUITests(unittest.TestCase):
         for control in controls:
             editor = control.lineEdit()
             self.assertEqual(editor.objectName(), "craftNumberEditor")
-            self.assertIn("color: #422f24", editor.styleSheet())
+            self.assertIn("color: #382517", editor.styleSheet())
             expected = min(23, control.maximum())
             control.setValue(expected)
             self.assertIn(str(expected), control.text())
+
+    def test_craft_number_has_visible_dark_pixels_on_parchment(self):
+        # Unlike checking only the stylesheet, inspect the actual Qt-painted
+        # control. This catches invisible text with a light Qt palette.
+        self.window.crafting_button.click()
+        page = self.window.crafting_page
+        box = page.sale_price
+        box.setValue(123456)
+        self.app.processEvents()
+        image = box.grab().toImage()
+        dark_pixels = 0
+        for y in range(8, max(9, image.height() - 8)):
+            for x in range(16, max(17, min(150, image.width() - 16))):
+                color = image.pixelColor(x, y)
+                if color.red() < 125 and color.green() < 125 and color.blue() < 125:
+                    dark_pixels += 1
+        self.assertGreater(dark_pixels, 12, "Craft input text must be visibly dark")
 
     def test_selected_craft_icon_has_no_recolouring(self):
         self.window.crafting_button.click()
