@@ -21,7 +21,7 @@ if not exist "app.py" (
 gh auth status >nul 2>nul
 if errorlevel 1 (
   echo.
-  echo Connexion GitHub necessaire (une seule fois)...
+  echo Connexion GitHub necessaire, uniquement au premier lancement...
   gh auth login
   if errorlevel 1 goto failed
 )
