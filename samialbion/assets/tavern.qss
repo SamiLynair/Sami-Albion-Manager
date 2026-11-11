@@ -26,6 +26,8 @@ QPushButton#settingsGear { background: #33271e; border: 1px solid #7f6039; borde
 QPushButton#settingsGear:hover, QPushButton#settingsGear[active="true"] { background: #6b4e2b; border-color: #dcb773; color: #fff0c8; }
 QFrame#settingsPanel { background: #222822; border: 1px solid #61543c; border-radius: 13px; }
 QLabel#settingsVersion { color: #d7c49b; font-size: 12px; }
+QCheckBox#clickSoundCheckbox { color: #e7d7b9; spacing: 9px; font-size: 12px; }
+QCheckBox#clickSoundCheckbox::indicator { width: 16px; height: 16px; }
 QLabel#selectedHint { color: #a8b99b; font-size: 10px; }
 
 QPushButton { outline: none; }

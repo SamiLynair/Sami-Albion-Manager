@@ -47,6 +47,7 @@ jobs:
             "--add-data", "samialbion.ico;.",
             "--add-data", "samialbion/assets/tavern.qss;samialbion/assets",
             "--add-data", "samialbion/assets/header_recolte.jpg;samialbion/assets",
+            "--add-data", "samialbion/assets/ui_click.wav;samialbion/assets",
             "--add-data", "samialbion/assets/catalog.json.gz;samialbion/assets",
             "--add-data", "samialbion/assets/market_shop_index.json.gz;samialbion/assets",
             "--add-data", "samialbion/assets/item_icons.zip;samialbion/assets",

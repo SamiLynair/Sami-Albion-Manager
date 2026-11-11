@@ -27,7 +27,7 @@ echo [2/3] Installation de Qt et PyInstaller...
 if errorlevel 1 goto error
 
 echo [3/3] Creation du programme Windows...
-".venv\Scripts\python.exe" -m PyInstaller --noconfirm --clean --onefile --windowed --name "Sami Albion Manager" --icon "samialbion.ico" --add-data "samialbion.ico;." --add-data "samialbion\assets\tavern.qss;samialbion\assets" --add-data "samialbion\assets\header_recolte.jpg;samialbion\assets" --add-data "samialbion\assets\catalog.json.gz;samialbion\assets" --add-data "samialbion\assets\market_shop_index.json.gz;samialbion\assets" --add-data "samialbion\assets\item_icons.zip;samialbion\assets" --add-data "samialbion\assets\item_icons_manifest.json;samialbion\assets" --add-data "samialbion\assets\fonts;samialbion\assets\fonts" app.py
+".venv\Scripts\python.exe" -m PyInstaller --noconfirm --clean --onefile --windowed --name "Sami Albion Manager" --icon "samialbion.ico" --add-data "samialbion.ico;." --add-data "samialbion\assets\tavern.qss;samialbion\assets" --add-data "samialbion\assets\header_recolte.jpg;samialbion\assets" --add-data "samialbion\assets\ui_click.wav;samialbion\assets" --add-data "samialbion\assets\catalog.json.gz;samialbion\assets" --add-data "samialbion\assets\market_shop_index.json.gz;samialbion\assets" --add-data "samialbion\assets\item_icons.zip;samialbion\assets" --add-data "samialbion\assets\item_icons_manifest.json;samialbion\assets" --add-data "samialbion\assets\fonts;samialbion\assets\fonts" app.py
 if errorlevel 1 goto error
 
 echo.

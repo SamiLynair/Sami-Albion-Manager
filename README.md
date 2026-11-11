@@ -17,6 +17,7 @@
 - **Images des objets** : **11 803 illustrations** issues du service de rendu du jeu, récupérées une seule fois pendant le développement et enregistrées localement au format WEBP dans `samialbion/assets/item_icons.zip`. Les variantes de qualité réutilisent l'illustration de base et affichent un cadre coloré et le niveau choisi. Les 700 identifiants sans rendu disponible gardent un pictogramme « ? », jamais une fausse image.
 - **Calculatrice** fermée au démarrage : elle se déploie uniquement en cliquant sur son volet en bas de la barre latérale. Opérations courantes et utilisation au clavier.
 - **Paramètres** : roue crantée près de « Made by Sami », ouvrant une page dédiée qui héberge désormais le bouton « Mises à jour ». Vérification discrète au démarrage, téléchargement, contrôle SHA-256, remplacement et redémarrage lors d'une nouvelle version GitHub. Confirmation obligatoire avant le téléchargement.
+- **Clics d'interface** : un son très court et discret accompagne les clics de souris. Il se désactive et se réactive dans Paramètres → Sons de l'interface ; le choix est mémorisé sur Windows.
 - **Catalogue épuré** : les entrées techniques sans nom d'objet sont masquées, tout comme les identifiants dans les infobulles et les fiches. La mention de bas de fiche a été supprimée.
 - **Signature** « Made by Sami », numéro de version en bleu et bandeau illustré du jeu.
 

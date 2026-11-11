@@ -5,19 +5,20 @@ from __future__ import annotations
 from pathlib import Path
 import sys
 
-from PySide6.QtCore import QEvent, QEasingCurve, QPropertyAnimation, QRectF, Qt
+from PySide6.QtCore import QEvent, QEasingCurve, QPropertyAnimation, QRectF, QSettings, Qt
 from PySide6.QtGui import (
     QColor, QFont, QFontDatabase, QIcon, QLinearGradient, QPainter,
     QPainterPath, QPen, QPixmap,
 )
 from PySide6.QtWidgets import (
-    QApplication, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel, QLineEdit,
+    QApplication, QCheckBox, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel, QLineEdit,
     QMainWindow, QPushButton, QStackedWidget, QVBoxLayout, QWidget,
 )
 
 from . import __version__
 from .calculator import Calculator
 from .catalogue_page import CataloguePage
+from .click_sound import ClickSound
 from .update_ui import UpdateController
 
 
@@ -193,6 +194,8 @@ class WorkshopWindow(QMainWindow):
         self.resize(1370, 870)
         self.setMinimumSize(1050, 720)
         self.expanded = False
+        self.preferences = QSettings("Sami", "SamiAlbionManager")
+        self.click_sound = ClickSound(self.preferences.value("ui/click_sound", True, type=bool))
         self._build()
         self.update_controller = UpdateController(self, self.updates_button)
         icon = Path(__file__).resolve().parents[1] / "samialbion.ico"
@@ -312,6 +315,19 @@ class WorkshopWindow(QMainWindow):
         subtitle = QLabel("Gérer les préférences et les mises à jour du logiciel")
         subtitle.setObjectName("catalogueSubtitle")
         settings_col.addWidget(subtitle)
+        sound_panel = QFrame()
+        sound_panel.setObjectName("settingsPanel")
+        sound_col = QVBoxLayout(sound_panel)
+        sound_col.setContentsMargins(22, 17, 22, 17)
+        sound_title = QLabel("Sons de l'interface")
+        sound_title.setObjectName("sectionTitle")
+        sound_col.addWidget(sound_title)
+        self.click_sound_checkbox = QCheckBox("Jouer un léger clic lors des interactions")
+        self.click_sound_checkbox.setObjectName("clickSoundCheckbox")
+        self.click_sound_checkbox.setChecked(self.click_sound.enabled)
+        self.click_sound_checkbox.toggled.connect(self._set_click_sound_enabled)
+        sound_col.addWidget(self.click_sound_checkbox)
+        settings_col.addWidget(sound_panel)
         update_panel = QFrame()
         update_panel.setObjectName("settingsPanel")
         update_col = QVBoxLayout(update_panel)
@@ -339,6 +355,10 @@ class WorkshopWindow(QMainWindow):
         self.pages.addWidget(self.settings_page)
         main_col.addWidget(self.pages, 1)
         base.addWidget(main, 1)
+
+    def _set_click_sound_enabled(self, enabled: bool):
+        self.click_sound.enabled = enabled
+        self.preferences.setValue("ui/click_sound", enabled)
 
     def _set_active_navigation(self, catalogue: bool):
         self.catalogue_button.setProperty("active", "true" if catalogue else "false")
@@ -389,6 +409,10 @@ class WorkshopWindow(QMainWindow):
         super().closeEvent(event)
 
     def eventFilter(self, watched, event):
+        if (event.type() == QEvent.Type.MouseButtonPress
+                and event.button() == Qt.MouseButton.LeftButton
+                and self.isVisible()):
+            self.click_sound.play()
         if event.type() == QEvent.Type.KeyPress and self.expanded:
             focus = QApplication.focusWidget()
             # Only the explicitly focused calculator receives arithmetic

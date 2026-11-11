@@ -2,6 +2,7 @@
 
 import os
 import unittest
+from unittest.mock import patch
 
 from samialbion import __version__
 
@@ -69,6 +70,22 @@ class CalculatorUITests(unittest.TestCase):
         self.assertTrue(self.window.updates_button.isVisible())
         self.window.catalogue_button.click()
         self.assertEqual(self.window.pages.currentWidget(), self.window.catalogue_page)
+
+    def test_click_sound_can_be_disabled_in_settings(self):
+        original = self.window.click_sound.enabled
+        try:
+            self.window.click_sound_checkbox.setChecked(not original)
+            self.assertEqual(self.window.click_sound.enabled, not original)
+            self.assertEqual(self.window.preferences.value("ui/click_sound", type=bool), not original)
+            self.app.installEventFilter(self.window)
+            try:
+                with patch.object(self.window.click_sound, "play") as play:
+                    QTest.mouseClick(self.window.settings_button, Qt.MouseButton.LeftButton)
+                    play.assert_called()
+            finally:
+                self.app.removeEventFilter(self.window)
+        finally:
+            self.window.click_sound_checkbox.setChecked(original)
 
     def test_clean_workshop_without_status_bar_or_descriptions(self):
         self.assertFalse(hasattr(self.window, "status"))
