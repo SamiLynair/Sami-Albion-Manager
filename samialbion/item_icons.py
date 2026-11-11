@@ -34,7 +34,9 @@ class OfflineIconStore:
         # Keep the full resolution of the locally stored render. Qt scales the
         # same icon down in the table while the detail panel stays sharp.
         canvas = QPixmap(96, 96)
-        canvas.fill(QColor("#253029"))
+        # The bundled WEBP artwork already has transparent corners. Preserve
+        # them instead of drawing an opaque dark square on parchment rows.
+        canvas.fill(Qt.GlobalColor.transparent)
         painter = QPainter(canvas)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         name = f"{item_id}.webp"

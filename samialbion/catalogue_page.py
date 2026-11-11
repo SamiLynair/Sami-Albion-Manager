@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QAbstractTableModel, QModelIndex, QSize, Qt, QTimer
-from PySide6.QtGui import QColor, QIcon, QPainter
+from PySide6.QtGui import QColor, QIcon, QPainter, QPalette
 from PySide6.QtWidgets import (
     QAbstractItemView, QApplication, QComboBox, QFrame, QGridLayout,
-    QHeaderView, QHBoxLayout, QLabel, QLineEdit, QMenu, QPushButton,
+    QHeaderView, QHBoxLayout, QLabel, QLineEdit, QListView, QMenu, QPushButton,
     QStyledItemDelegate, QStyle, QStyleOptionViewItem, QTableView,
     QVBoxLayout, QWidget,
 )
@@ -139,6 +139,15 @@ class CataloguePage(QWidget):
         combo = QComboBox()
         combo.setObjectName("catalogueFilter")
         combo.setMinimumHeight(37)
+        popup = QListView(combo)
+        popup.setObjectName("cataloguePopup")
+        palette = popup.palette()
+        palette.setColor(QPalette.ColorRole.Base, QColor("#382c22"))
+        palette.setColor(QPalette.ColorRole.Text, QColor("#fff0d5"))
+        palette.setColor(QPalette.ColorRole.Highlight, QColor("#9a794b"))
+        palette.setColor(QPalette.ColorRole.HighlightedText, QColor("#fff6e6"))
+        popup.setPalette(palette)
+        combo.setView(popup)
         for label, value in choices:
             combo.addItem(label, value)
         combo.setAccessibleName(title)

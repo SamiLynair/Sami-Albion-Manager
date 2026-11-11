@@ -86,6 +86,15 @@ class CatalogueUITests(unittest.TestCase):
         self.assertIsInstance(decoration, QPixmap)
         self.assertIsInstance(self.page.table.itemDelegateForColumn(0), NeutralIconDelegate)
 
+    def test_item_icons_keep_their_transparent_corners(self):
+        pixmap = self.page.icons.icon("T8_ORE").pixmap(96, 96)
+        self.assertEqual(pixmap.toImage().pixelColor(0, 0).alpha(), 0)
+
+    def test_filter_popups_have_readable_market_style(self):
+        for combo in (self.page.tier, self.page.enchantment, self.page.quality):
+            self.assertEqual(combo.view().objectName(), "cataloguePopup")
+            self.assertGreater(combo.count(), 1)
+
     def test_selected_row_does_not_recolour_carrot_or_other_icons(self):
         for identifier in ("T1_CARROT", "T4_MAIN_SWORD"):
             with self.subTest(item=identifier):
