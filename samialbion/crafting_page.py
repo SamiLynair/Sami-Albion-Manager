@@ -5,11 +5,12 @@ from __future__ import annotations
 from PySide6.QtCore import QSettings, QSize, Qt, QTimer
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
-    QAbstractItemView, QCheckBox, QComboBox, QDoubleSpinBox, QFrame, QGridLayout,
-    QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QScrollArea, QSpinBox, QVBoxLayout,
+    QAbstractItemView, QCheckBox, QDoubleSpinBox, QFrame, QGridLayout,
+    QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QAbstractSpinBox, QScrollArea, QSpinBox, QVBoxLayout,
     QWidget,
 )
 
+from .catalogue_page import MarketFilterComboBox
 from .crafting import CraftingRecipes, calculate_profit
 from .inventory_catalog import OfflineItemCatalog, fold
 from .item_icons import OfflineIconStore
@@ -60,13 +61,13 @@ class CraftingPage(QWidget):
         self.search.setPlaceholderText("Rechercher un objet à fabriquer…")
         finder_col.addWidget(self.search)
         filters = QHBoxLayout()
-        self.tier = QComboBox()
+        self.tier = MarketFilterComboBox()
         self.tier.setObjectName("craftFilter")
         self.tier.addItem("Tous les tiers", None)
         for tier in range(1, 9):
             self.tier.addItem(f"Tier {tier}", tier)
         filters.addWidget(self.tier)
-        self.enchant = QComboBox()
+        self.enchant = MarketFilterComboBox()
         self.enchant.setObjectName("craftFilter")
         self.enchant.addItem("Tous les enchant.", None)
         for enchant in range(5):
@@ -124,7 +125,7 @@ class CraftingPage(QWidget):
         sell_layout.addWidget(self._label("Prix de vente unitaire au marché", "craftField"), 0, 0)
         self.sale_price = self._price_input("Prix de vente")
         self.sale_price.valueChanged.connect(self._price_changed)
-        sell_layout.addWidget(self.sale_price, 0, 1)
+        sell_layout.addWidget(self._with_step_buttons(self.sale_price), 0, 1)
         sell_layout.addWidget(self._label("Quantité d'objets souhaitée", "craftField"), 1, 0)
         self.target_units = QSpinBox()
         self.target_units.setObjectName("craftNumber")
@@ -132,7 +133,7 @@ class CraftingPage(QWidget):
         self.target_units.setRange(1, 1_000_000)
         self.target_units.setValue(1)
         self.target_units.valueChanged.connect(self._recalculate)
-        sell_layout.addWidget(self.target_units, 1, 1)
+        sell_layout.addWidget(self._with_step_buttons(self.target_units), 1, 1)
         self.production_note = self._label("", "craftExplanation")
         self.production_note.setWordWrap(True)
         sell_layout.addWidget(self.production_note, 2, 0, 1, 2)
@@ -153,7 +154,7 @@ class CraftingPage(QWidget):
         self.artisan_fee = self._price_input("Coût de l'artisan par fabrication")
         self.artisan_fee.setValue(int(self.preferences.value("craft/artisan_fee", 0)))
         self.artisan_fee.valueChanged.connect(self._options_changed)
-        fees_layout.addWidget(self.artisan_fee, 2, 1)
+        fees_layout.addWidget(self._with_step_buttons(self.artisan_fee), 2, 1)
         fees_layout.addWidget(self._label("Retour de ressources (%)", "craftField"), 3, 0)
         self.return_rate = QDoubleSpinBox()
         self.return_rate.setObjectName("craftNumber")
@@ -164,7 +165,7 @@ class CraftingPage(QWidget):
         self.return_rate.setSuffix("  %")
         self.return_rate.setValue(float(self.preferences.value("craft/return_rate", 0)))
         self.return_rate.valueChanged.connect(self._options_changed)
-        fees_layout.addWidget(self.return_rate, 3, 1)
+        fees_layout.addWidget(self._with_step_buttons(self.return_rate), 3, 1)
         detail_col.addWidget(fees_panel)
 
         self.breakdown = self._label("", "craftBreakdown")
@@ -216,6 +217,25 @@ class CraftingPage(QWidget):
         control.setSuffix("  argent")
         control.setSingleStep(100)
         return control
+
+    @staticmethod
+    def _with_step_buttons(control):
+        """Show compact, readable minus/plus buttons instead of native spin arrows."""
+        control.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
+        holder = QWidget()
+        row = QHBoxLayout(holder)
+        row.setContentsMargins(0, 0, 0, 0)
+        row.setSpacing(3)
+        row.addWidget(control, 1)
+        for symbol, direction in (("−", -1), ("+", 1)):
+            button = QPushButton(symbol)
+            button.setObjectName("craftStepButton")
+            button.setAccessibleName(("Diminuer " if direction < 0 else "Augmenter ") + control.accessibleName())
+            button.setFixedSize(24, 27)
+            button.setAutoRepeat(True)
+            button.clicked.connect(control.stepDown if direction < 0 else control.stepUp)
+            row.addWidget(button)
+        return holder
 
     def _metric(self, grid, row, column, caption):
         panel = QFrame()
@@ -296,7 +316,7 @@ class CraftingPage(QWidget):
             control = self._price_input(f"Prix de {name}")
             control.setValue(int(self.preferences.value(f"craft/material/{material_id}", 0)))
             control.valueChanged.connect(lambda value, key=material_id: self._material_price_changed(key, value))
-            self.materials_layout.addWidget(control, index, 2)
+            self.materials_layout.addWidget(self._with_step_buttons(control), index, 2)
             subtotal = self._label("0", "craftResource")
             self.materials_layout.addWidget(subtotal, index, 3)
             self.material_inputs[material_id] = control
