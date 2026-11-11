@@ -56,6 +56,9 @@ class CalculatorUITests(unittest.TestCase):
     def test_author_and_version_in_sidebar(self):
         self.assertEqual(self.window.author_label.text(), "Made by Sami")
         self.assertEqual(self.window.version_label.text(), f"v{__version__}")
+        labels = [label.text() for label in self.window.findChildren(QLabel)]
+        self.assertIn("FAN-MADE", labels)
+        self.assertTrue(self.window.settings_button.isEnabled())
 
     def test_github_updates_button_is_available(self):
         self.assertEqual(self.window.updates_button.text(), "↻   Mises à jour")

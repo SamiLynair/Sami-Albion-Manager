@@ -10,6 +10,7 @@
 - **Filtres** : catégorie, tier (T1 à T8), enchantement (.0 à .4) et qualité (normale à exceptionnelle) pour les équipements où elle s'applique.
 - **Réinitialiser les filtres** : un bouton à droite de la recherche efface le texte, la catégorie, le tier, l'enchantement et la qualité en un clic.
 - **Style du marché** : recherche et filtres couleur parchemin, touches dorées et tableau clair sur fond de bois sombre, sans ajouter de tarifs ou de connexion au jeu.
+- **Bandeau latéral harmonisé** : bois brun foncé, boutons bronze et or, badge « FAN-MADE », calculatrice et panneau serveur assortis au catalogue.
 - **Retouches visuelles** : icônes sans carré sombre opaque, alignement du champ des catégories et listes déroulantes aux textes clairs et contrastés.
 - **Sélection discrète** : la ligne de l'objet est mise en évidence sans recolorer son image.
 - **Recherche au clavier corrigée** : les touches Retour arrière et Supprimer fonctionnent normalement ; les raccourcis de la calculatrice ne s'activent que lorsque celle-ci est sélectionnée.

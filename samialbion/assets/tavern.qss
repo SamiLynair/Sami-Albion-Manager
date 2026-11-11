@@ -2,13 +2,15 @@
 QWidget#root { background: #151a17; color: #f2e6cd; }
 QWidget { font-family: "Segoe UI"; color: #eadfc8; font-size: 12px; }
 QWidget#pageBody { background: transparent; }
-QFrame#sideBar { background: #181d19; border-right: 1px solid #4b4331; }
-QFrame#sideBrand { background: transparent; border-bottom: 1px solid #564832; }
+QFrame#sideBar { background: qlineargradient(x1:0,y1:0,x2:1,y2:1,stop:0 #2d231c,stop:0.55 #241c17,stop:1 #191613); border-right: 2px solid #765733; }
+QFrame#sideBrand { background: qlineargradient(x1:0,y1:0,x2:1,y2:0,stop:0 #35271d,stop:1 #251d17); border: 1px solid #60482e; border-bottom: 2px solid #b08145; border-radius: 8px; }
 QFrame#panel { background: #222822; border: 1px solid #4d4937; border-radius: 14px; }
 QFrame#panelWarm { background: #29291f; border: 1px solid #67533a; border-radius: 14px; }
 QFrame#metric { background: #252b23; border: 1px solid #514934; border-radius: 13px; }
-QLabel#brand { font-family: "Noto Serif"; font-size: 23px; font-weight: bold; color: #f0c77f; }
-QLabel#brandSub { font-family: "Segoe UI"; color: #c4b897; font-size: 11px; font-weight: 600; }
+QLabel#brand { font-family: "Noto Serif"; font-size: 23px; font-weight: bold; color: #f5d59a; }
+QLabel#brandSub { font-family: "Segoe UI"; color: #d2aa6b; font-size: 11px; font-weight: 600; letter-spacing: 1px; }
+QLabel#fanMadeBadge { color: #302215; background: #d4a951; border: 1px solid #f0cc7d; border-radius: 4px; font-size: 8px; font-weight: bold; padding: 3px 5px; }
+QFrame#sideBar QLabel#fieldCaption { color: #c79f61; font-size: 10px; font-weight: bold; }
 QLabel#pageTitle { font-family: "Noto Serif"; font-size: 27px; font-weight: bold; color: #f4e3bf; }
 QLabel#pageSub { color: #b4ad98; font-size: 11px; }
 QLabel#sectionTitle { font-family: "Noto Serif"; font-size: 16px; font-weight: bold; color: #e9c384; }
@@ -17,20 +19,20 @@ QLabel#metricTitle { color: #bbb497; font-size: 10px; font-weight: bold; }
 QLabel#metricValue { color: #f9edcc; font-size: 20px; font-weight: bold; }
 QLabel#metricHint { color: #a6ab98; font-size: 10px; }
 QLabel#smallNote { color: #a5a58f; font-size: 10px; }
-QLabel#pill { font-family: "Segoe UI"; background: #364032; border: 1px solid #718164; border-radius: 9px; padding: 5px 11px; color: #c4d5a7; font-size: 11px; font-weight: 600; }
+QLabel#pill { font-family: "Segoe UI"; background: #3a2c1f; border: 1px solid #937044; border-radius: 8px; padding: 5px 11px; color: #e9c68d; font-size: 11px; font-weight: 600; }
 QLabel#woodPill { background: #473725; border: 1px solid #977548; border-radius: 9px; padding: 5px 11px; color: #e5c48a; font-size: 10px; font-weight: bold; }
-QLabel#footerAuthor { color: #ede8df; font-family: "Segoe UI"; font-size: 12px; }
+QLabel#footerAuthor { color: #ead9bc; font-family: "Segoe UI"; font-size: 12px; }
 QLabel#footerVersion { color: #38a9ee; font-family: "Segoe UI"; font-size: 12px; }
-QPushButton#settingsGear { background: transparent; border: 1px solid transparent; border-radius: 7px; color: #cbbd9c; font-family: "Segoe UI Symbol"; font-size: 20px; padding: 0; }
-QPushButton#settingsGear:hover, QPushButton#settingsGear[active="true"] { background: #30372d; border-color: #756346; color: #f3d296; }
+QPushButton#settingsGear { background: #33271e; border: 1px solid #7f6039; border-radius: 7px; color: #d7b67f; font-family: "Segoe UI Symbol"; font-size: 20px; padding: 0; }
+QPushButton#settingsGear:hover, QPushButton#settingsGear[active="true"] { background: #6b4e2b; border-color: #dcb773; color: #fff0c8; }
 QFrame#settingsPanel { background: #222822; border: 1px solid #61543c; border-radius: 13px; }
 QLabel#settingsVersion { color: #d7c49b; font-size: 12px; }
 QLabel#selectedHint { color: #a8b99b; font-size: 10px; }
 
 QPushButton { outline: none; }
-QPushButton#nav { background: transparent; border: 1px solid transparent; border-radius: 10px; color: #b6b8a8; font-size: 12px; text-align: left; padding: 13px 16px; }
-QPushButton#nav:hover { background: #30372d; color: #f8e3b5; }
-QPushButton#nav[active="true"] { background: #3b402e; border: 1px solid #7a6945; color: #f3d296; font-weight: bold; }
+QPushButton#nav { background: #30271f; border: 1px solid #5a4732; border-radius: 7px; color: #d2b78e; font-size: 12px; text-align: left; padding: 13px 16px; }
+QPushButton#nav:hover { background: #493623; border-color: #b18b51; color: #f9e4bb; }
+QPushButton#nav[active="true"] { background: qlineargradient(x1:0,y1:0,x2:0,y2:1,stop:0 #916c35,stop:0.45 #735127,stop:1 #523b25); border: 1px solid #d5a65d; color: #fff0c9; font-weight: bold; }
 QPushButton#navSecondary { background: transparent; border: 1px solid transparent; border-radius: 10px; color: #c4bca6; font-size: 12px; text-align: left; padding: 11px 16px; }
 QPushButton#navSecondary:hover { background: #30372d; border-color: #65583f; color: #f8dba2; }
 QPushButton#navSecondary:disabled { color: #8c907f; }
@@ -73,11 +75,11 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal { width: 0px; }
 QFrame#emptyWorkbench { background: #1d241f; border: 1px solid #4c4b38; border-radius: 16px; }
 QLabel#emptySymbol { color: #b39362; font-family: Georgia; font-size: 37px; }
 QLabel#emptyTitle { font-family: "Noto Serif"; font-size: 25px; color: #edd3a2; font-weight: bold; }
-QPushButton#drawerToggle { font-family: "Segoe UI"; background: #3b402e; color: #f0cf91; border: 1px solid #83704a; border-radius: 8px; padding: 6px 11px; font-size: 12px; font-weight: 600; text-align: left; }
-QPushButton#drawerToggle:hover { background: #4a523a; border-color: #d1ae72; }
-QPushButton#drawerToggle[active="false"] { background: #292f27; color: #c5b793; }
-QFrame#calcDrawer { background: #292920; border: 1px solid #655239; border-radius: 10px; }
-QFrame#calcDisplay { background: #171d19; border: 1px solid #675a3e; border-radius: 7px; }
+QPushButton#drawerToggle { font-family: "Segoe UI"; background: #4d3824; color: #f3d398; border: 1px solid #ac8550; border-radius: 7px; padding: 6px 11px; font-size: 12px; font-weight: 600; text-align: left; }
+QPushButton#drawerToggle:hover { background: #6a4b2d; border-color: #ddad63; }
+QPushButton#drawerToggle[active="false"] { background: #30261e; color: #d0b38d; }
+QFrame#calcDrawer { background: #30251c; border: 1px solid #8b663c; border-radius: 9px; }
+QFrame#calcDisplay { background: #1f1915; border: 1px solid #7d603b; border-radius: 7px; }
 QLabel#calcHistory { font-size: 9px; color: #a9a991; }
 QLabel#calcValue { font-size: 21px; font-weight: bold; color: #f2e1be; }
 QPushButton#calcNumber, QPushButton#calcOperator, QPushButton#calcUtility, QPushButton#calcEquals { border-radius: 6px; font-size: 12px; font-weight: bold; padding: 2px; }
