@@ -116,8 +116,9 @@ class CalculatorUITests(unittest.TestCase):
             editor = control.lineEdit()
             self.assertEqual(editor.objectName(), "craftNumberEditor")
             self.assertIn("color: #422f24", editor.styleSheet())
-            control.setValue(123)
-            self.assertIn("123", control.text())
+            expected = min(23, control.maximum())
+            control.setValue(expected)
+            self.assertIn(str(expected), control.text())
 
     def test_selected_craft_icon_has_no_recolouring(self):
         self.window.crafting_button.click()
