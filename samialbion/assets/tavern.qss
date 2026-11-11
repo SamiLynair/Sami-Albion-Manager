@@ -152,3 +152,9 @@ QSpinBox#craftNumber:focus { background: #f6e9d0; border-color: #dfba77; }
 QDoubleSpinBox#craftNumber { background: #e8d7bd; color: #422f24; border: 1px solid #8d765a; border-radius: 8px; padding: 7px 9px; min-width: 115px; }
 QDoubleSpinBox#craftNumber:focus { background: #f6e9d0; border-color: #dfba77; }
 QScrollArea#craftScroll { border: none; background: transparent; }
+
+/* v0.4.2: compact explicit craft quantity controls */
+QPushButton#craftStepButton { background: #62492f; color: #f7e1b4; border: 1px solid #a68759; border-radius: 5px; font-family: "Segoe UI"; font-size: 16px; font-weight: bold; padding: 0; }
+QPushButton#craftStepButton:hover { background: #84623e; color: #fff4dd; border-color: #dfb875; }
+QPushButton#craftStepButton:pressed { background: #ad854e; color: #21180f; }
+QPushButton#craftStepButton:disabled { background: #453c33; color: #8c816e; border-color: #6a5944; }
