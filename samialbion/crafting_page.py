@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QSettings, QSize, Qt, QTimer
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QColor, QIcon, QPalette
 from PySide6.QtWidgets import (
     QAbstractItemView, QCheckBox, QDoubleSpinBox, QFrame, QGridLayout,
     QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QAbstractSpinBox, QScrollArea, QSpinBox, QVBoxLayout,
@@ -226,10 +226,30 @@ class CraftingPage(QWidget):
         # theme otherwise paints its text in cream against parchment fields.
         editor = control.lineEdit()
         editor.setObjectName("craftNumberEditor")
+        # Windows/Qt sometimes ignores a QSpinBox's foreground QSS for its
+        # internal editor. Explicitly assign BOTH palettes and a direct style.
+        # This prevents cream text on the parchment input background.
+        dark = QColor("#382517")
+        paper = QColor("#e8d7bd")
+        for widget in (control, editor):
+            palette = widget.palette()
+            palette.setColor(QPalette.ColorRole.Text, dark)
+            palette.setColor(QPalette.ColorRole.WindowText, dark)
+            palette.setColor(QPalette.ColorRole.ButtonText, dark)
+            palette.setColor(QPalette.ColorRole.Base, paper)
+            palette.setColor(QPalette.ColorGroup.Disabled, QPalette.ColorRole.Text, dark)
+            widget.setPalette(palette)
         editor.setStyleSheet(
-            "QLineEdit#craftNumberEditor { color: #422f24; "
-            "background: transparent; border: none; padding: 0px; "
-            "selection-color: #fff5df; selection-background-color: #8c6a42; }"
+            "color: #382517; background: transparent; border: 0px; "
+            "padding: 0px; selection-color: #fff5df; "
+            "selection-background-color: #8c6a42;"
+        )
+        control.setStyleSheet(
+            "QSpinBox, QDoubleSpinBox { color: #382517; background: #e8d7bd; "
+            "border: 1px solid #8d765a; border-radius: 8px; "
+            "padding: 7px 9px; min-width: 115px; } "
+            "QSpinBox:focus, QDoubleSpinBox:focus { "
+            "color: #382517; background: #f6e9d0; border-color: #dfba77; }"
         )
         holder = QWidget()
         row = QHBoxLayout(holder)
