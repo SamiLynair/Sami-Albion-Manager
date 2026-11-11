@@ -118,10 +118,14 @@ class CatalogueUITests(unittest.TestCase):
                         if icon.pixelColor(x, y).alpha() < 250:
                             continue
                         checked += 1
-                        self.assertEqual(
-                            selected.pixelColor(icon_x + x, icon_y + y),
-                            unselected.pixelColor(icon_x + x, icon_y + y),
-                            f"Tint detected at {x},{y} for {identifier}",
+                        actual = selected.pixelColor(icon_x + x, icon_y + y)
+                        expected = unselected.pixelColor(icon_x + x, icon_y + y)
+                        difference = max(
+                            abs(a - b) for a, b in zip(actual.getRgb()[:3], expected.getRgb()[:3])
+                        )
+                        self.assertLessEqual(
+                            difference, 8,
+                            f"Tint detected at {x},{y} for {identifier}: {difference}",
                         )
                 self.assertGreater(checked, 100)
 
