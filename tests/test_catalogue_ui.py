@@ -109,13 +109,21 @@ class CatalogueUITests(unittest.TestCase):
                 self.page.table.clearSelection()
                 self.app.processEvents()
                 unselected = self.page.table.viewport().grab().toImage()
+                icon = self.page.icons.icon(identifier).pixmap(43, 43).toImage()
+                checked = 0
                 for y in range(43):
                     for x in range(43):
+                        # Transparent icon corners correctly show the selected
+                        # row background, which is different by design.
+                        if icon.pixelColor(x, y).alpha() < 250:
+                            continue
+                        checked += 1
                         self.assertEqual(
                             selected.pixelColor(icon_x + x, icon_y + y),
                             unselected.pixelColor(icon_x + x, icon_y + y),
                             f"Tint detected at {x},{y} for {identifier}",
                         )
+                self.assertGreater(checked, 100)
 
     def test_market_menu_has_three_levels(self):
         menu = self.page.category_button.menu()
