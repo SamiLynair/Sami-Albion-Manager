@@ -8,6 +8,8 @@
 - **Recherche française/anglaise** par nom d'objet. Les identifiants techniques ne sont pas affichés.
 - **Classement comme au marché d'Albion** : menu compact en trois niveaux, par exemple **Armes → Arc → Arc de guerre**, ou **Fabrication → Ressources raffinées → Lingot**. Les catégories et sous-catégories proviennent des données de jeu `items.xml` ; les familles d'objets sont déduites localement de leurs noms. Les nouveautés sans correspondance dans ces données utilisent des catégories de remplacement.
 - **Filtres** : catégorie, tier (T1 à T8), enchantement (.0 à .4) et qualité (normale à exceptionnelle) pour les équipements où elle s'applique.
+- **Réinitialiser les filtres** : un bouton à droite de la recherche efface le texte, la catégorie, le tier, l'enchantement et la qualité en un clic.
+- **Style du marché** : recherche et filtres couleur parchemin, touches dorées et tableau clair sur fond de bois sombre, sans ajouter de tarifs ou de connexion au jeu.
 - **Sélection discrète** : la ligne de l'objet est mise en évidence sans recolorer son image.
 - **Recherche au clavier corrigée** : les touches Retour arrière et Supprimer fonctionnent normalement ; les raccourcis de la calculatrice ne s'activent que lorsque celle-ci est sélectionnée.
 - **Images des objets** : **11 803 illustrations** issues du service de rendu du jeu, récupérées une seule fois pendant le développement et enregistrées localement au format WEBP dans `samialbion/assets/item_icons.zip`. Les variantes de qualité réutilisent l'illustration de base et affichent un cadre coloré et le niveau choisi. Les 700 identifiants sans rendu disponible gardent un pictogramme « ? », jamais une fausse image.

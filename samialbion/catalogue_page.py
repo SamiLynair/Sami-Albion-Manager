@@ -116,7 +116,7 @@ class NeutralIconDelegate(QStyledItemDelegate):
                                pixmap)
 
         selected = bool(option.state & QStyle.StateFlag.State_Selected)
-        painter.setPen(QColor("#18231b" if selected else "#ebdfc8"))
+        painter.setPen(QColor("#33271d" if selected else "#4a3325"))
         painter.setFont(option.font)
         text_rect = option.rect.adjusted(60, 0, -8, 0)
         title = str(index.data(Qt.ItemDataRole.DisplayRole) or "")
@@ -229,7 +229,14 @@ class CataloguePage(QWidget):
         self.search.setObjectName("catalogueSearch")
         self.search.setPlaceholderText("Rechercher un objet ou une ressource…")
         self.search.setMinimumHeight(39)
-        filters_layout.addWidget(self.search, 0, 0, 1, 4)
+        filters_layout.addWidget(self.search, 0, 0, 1, 3)
+        self.reset_button = QPushButton("↺  Réinitialiser les filtres")
+        self.reset_button.setObjectName("resetFilters")
+        self.reset_button.setToolTip("Effacer la recherche et tous les filtres")
+        self.reset_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.reset_button.setMinimumHeight(39)
+        self.reset_button.clicked.connect(self.reset_filters)
+        filters_layout.addWidget(self.reset_button, 0, 3)
         self.category_button = QPushButton("Toutes les catégories")
         self.category_button.setObjectName("marketCategoryButton")
         self.category_button.setMinimumHeight(37)
@@ -295,6 +302,21 @@ class CataloguePage(QWidget):
         detail_col.addStretch()
         body.addWidget(detail)
         layout.addLayout(body, 1)
+
+    def reset_filters(self):
+        """Return the entire market search to its initial, unfiltered state."""
+        self.search_delay.stop()
+        self.search.blockSignals(True)
+        self.search.clear()
+        self.search.blockSignals(False)
+        for combo in (self.tier, self.enchantment, self.quality):
+            combo.blockSignals(True)
+            combo.setCurrentIndex(0)
+            combo.blockSignals(False)
+        self.market_path = None
+        self.category_button.setText("Toutes les catégories")
+        self.category_button.setToolTip("Afficher toutes les catégories")
+        self._refresh()
 
     def _refresh(self, *_):
         items = self.catalogue.find(

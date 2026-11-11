@@ -57,6 +57,20 @@ class CatalogueUITests(unittest.TestCase):
         self.assertGreater(self.page.model.rowCount(), 0)
         self.assertTrue(all(item.has_qualities for item in self.page.model.items))
 
+    def test_reset_search_and_every_filter(self):
+        self.page.search.setText("minerai")
+        self.page._select_market_path(("Fabrication", "Ressources brutes", "Minerai"))
+        self.page.tier.setCurrentIndex(4)
+        self.page.enchantment.setCurrentIndex(3)
+        self.page.quality.setCurrentIndex(1)
+        self.page.reset_button.click()
+        self.assertEqual(self.page.search.text(), "")
+        self.assertIsNone(self.page.market_path)
+        self.assertEqual(self.page.category_button.text(), "Toutes les catégories")
+        self.assertTrue(all(combo.currentIndex() == 0 for combo in (
+            self.page.tier, self.page.enchantment, self.page.quality)))
+        self.assertEqual(self.page.model.rowCount(), len(self.page.catalogue.items))
+
     def test_nested_market_category_filters(self):
         self.page._select_market_path(("Armes", "Arc", "Arc de guerre"))
         self.assertGreater(self.page.model.rowCount(), 0)

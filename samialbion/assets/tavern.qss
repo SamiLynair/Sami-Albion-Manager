@@ -91,26 +91,32 @@ QPushButton#calcEquals { background: #dfb775; color: #29251b; border: 1px solid 
 QPushButton#calcEquals:hover { background: #f1cf8c; }
 QPushButton#calcNumber:pressed, QPushButton#calcOperator:pressed, QPushButton#calcUtility:pressed, QPushButton#calcEquals:pressed { background: #a98d60; color: #241e16; }
 
-/* Offline item catalogue: readable, quiet, and consistent with the workshop. */
-QLabel#catalogueTitle { font-family: "Noto Serif"; font-size: 23px; font-weight: bold; color: #f0d5a5; }
-QLabel#catalogueSubtitle { color: #b6b6a3; font-size: 11px; }
-QLabel#catalogueCount { color: #e4c183; font-size: 12px; font-weight: 600; }
-QFrame#catalogueFilters { background: #202822; border: 1px solid #5a533e; border-radius: 12px; }
-QLineEdit#catalogueSearch { background: #171f1a; border-radius: 8px; padding-left: 12px; color: #f0e5cf; font-size: 13px; }
-QComboBox#catalogueFilter { background: #2b352c; color: #f2e4c5; border: 1px solid #6f684b; border-radius: 8px; padding: 6px 10px; font-size: 11px; }
-QComboBox#catalogueFilter:hover { background: #344232; border-color: #b99a64; }
-QTableView#itemsTable { background: #202821; alternate-background-color: #253027; border: 1px solid #5a553f; border-radius: 10px; color: #ebdfc8; gridline-color: #3a4638; font-size: 12px; outline: none; }
-QTableView#itemsTable::item { padding: 3px 8px; border: none; }
-QTableView#itemsTable::item:selected { background: #cbd4c6; color: #18231b; }
-QFrame#itemDetail { background: #272d24; border: 1px solid #66563a; border-radius: 12px; }
-QLabel#detailCaption { font-family: "Noto Serif"; font-size: 12px; font-weight: bold; color: #dfbc7f; }
-QLabel#detailName { font-family: "Noto Serif"; color: #f3dcae; font-size: 17px; font-weight: bold; }
-QLabel#detailData { color: #cbd0be; font-family: "Segoe UI"; font-size: 11px; }
-QLabel#offlineNote { color: #a4b69c; font-size: 10px; }
+/* Market-hub-inspired artisan theme: dark timber, gold controls, parchment rows. */
+QLabel#catalogueTitle { font-family: "Noto Serif"; font-size: 23px; font-weight: bold; color: #f1cf91; }
+QLabel#catalogueSubtitle { color: #bea98e; font-size: 11px; }
+QLabel#catalogueCount { color: #e8bb69; font-size: 12px; font-weight: 600; }
+QFrame#catalogueFilters { background: #30241b; border: 1px solid #80613b; border-radius: 10px; }
+QLineEdit#catalogueSearch { background: #e4d4ba; color: #4b3525; border: 2px solid #8e7150; border-radius: 17px; padding-left: 16px; font-size: 12px; selection-background-color: #a88654; }
+QLineEdit#catalogueSearch:focus { background: #f2e5ce; border-color: #d9ac56; }
+QLineEdit#catalogueSearch::placeholder { color: #856f5b; }
+QPushButton#resetFilters { background: #4e4e4c; color: #f0ddb5; border: 1px solid #a88d63; border-radius: 17px; padding: 6px 12px; font-size: 11px; font-weight: 600; }
+QPushButton#resetFilters:hover { background: #69543a; border-color: #e6bf75; color: #fff2d3; }
+QPushButton#resetFilters:pressed { background: #897047; }
+QComboBox#catalogueFilter { background: #e2d2b7; color: #422f24; border: 1px solid #8d765a; border-radius: 15px; padding: 6px 12px; font-size: 11px; }
+QComboBox#catalogueFilter:hover { background: #f0e2c9; border-color: #d1a660; }
+QComboBox#catalogueFilter:focus { background: #f3e5cb; border-color: #c49c56; }
+QTableView#itemsTable { background: #e5d7c4; alternate-background-color: #d9c9b3; border: 3px solid #756048; border-radius: 5px; color: #493424; gridline-color: #b7a58d; font-size: 12px; outline: none; selection-background-color: #e4c98f; selection-color: #33271d; }
+QTableView#itemsTable::item { padding: 3px 8px; border: none; border-bottom: 1px solid #c7b59d; }
+QTableView#itemsTable::item:selected { background: #e4c98f; color: #33271d; }
+QTableView#itemsTable QHeaderView::section { background: #d3c0a5; color: #63442e; border: none; border-bottom: 2px solid #aa8e67; font-family: "Noto Serif"; font-weight: bold; padding: 10px 7px; }
+QFrame#itemDetail { background: #302820; border: 1px solid #93734b; border-radius: 10px; }
+QLabel#detailCaption { font-family: "Noto Serif"; font-size: 12px; font-weight: bold; color: #e3b968; }
+QLabel#detailName { font-family: "Noto Serif"; color: #f6dbab; font-size: 17px; font-weight: bold; }
+QLabel#detailData { color: #dfd0b7; font-family: "Segoe UI"; font-size: 11px; }
 
 /* Market-style, three-tier submenus with calm selection highlights. */
-QPushButton#marketCategoryButton { background: #2b352c; color: #f2e4c5; border: 1px solid #6f684b; border-radius: 8px; padding: 7px 11px; font-size: 11px; text-align: left; }
-QPushButton#marketCategoryButton:hover { background: #344232; border-color: #b99a64; }
+QPushButton#marketCategoryButton { background: #e2d2b7; color: #422f24; border: 1px solid #8d765a; border-radius: 15px; padding: 7px 13px; font-size: 11px; text-align: left; }
+QPushButton#marketCategoryButton:hover { background: #f0e2c9; border-color: #d1a660; }
 QPushButton#marketCategoryButton::menu-indicator { subcontrol-origin: padding; subcontrol-position: center right; width: 14px; height: 12px; }
 QMenu#marketMenu { background: #3d3529; color: #f3e4c9; border: 1px solid #947653; padding: 3px; font-family: "Segoe UI"; font-size: 11px; }
 QMenu#marketMenu::item { padding: 4px 16px 4px 8px; margin: 0; border-radius: 3px; }
