@@ -1,4 +1,4 @@
-# Sami Albion Manager · V0.3.6
+# Sami Albion Manager · V0.3.7
 
 **Le Comptoir du Récolteur** est un logiciel Windows personnel pour Albion Online, intégralement utilisable hors ligne.
 
