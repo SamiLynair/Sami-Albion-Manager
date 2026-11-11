@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from PySide6.QtCore import QRegularExpression, QSettings, QSize, Qt, QTimer
-from PySide6.QtGui import QIcon, QRegularExpressionValidator
+from PySide6.QtCore import QPoint, QRegularExpression, QSettings, QSize, Qt, QTimer
+from PySide6.QtGui import QColor, QIcon, QPainter, QPen, QRegularExpressionValidator
 from PySide6.QtWidgets import (
     QAbstractItemView, QCheckBox, QDoubleSpinBox, QFrame, QGridLayout,
     QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QAbstractSpinBox, QScrollArea, QSpinBox, QVBoxLayout,
-    QWidget,
+    QWidget, QStyle, QStyleOptionButton,
 )
 
 from .catalogue_page import MarketFilterComboBox
@@ -18,6 +18,29 @@ from .item_icons import OfflineIconStore
 
 def silver(value: int) -> str:
     return f"{value:,}".replace(",", " ") + " argent"
+
+
+class GoldCheckBox(QCheckBox):
+    """Explicit high-contrast tick, independent of platform checkbox glyph."""
+
+    def paintEvent(self, event):
+        super().paintEvent(event)
+        if not self.isChecked():
+            return
+        option = QStyleOptionButton()
+        self.initStyleOption(option)
+        rect = self.style().subElementRect(
+            QStyle.SubElement.SE_CheckBoxIndicator, option, self
+        )
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        painter.setPen(QPen(QColor("#2d2115"), 3, Qt.PenStyle.SolidLine,
+                            Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
+        midx = rect.center().x()
+        midy = rect.center().y()
+        painter.drawLine(QPoint(midx - 5, midy), QPoint(midx - 1, midy + 4))
+        painter.drawLine(QPoint(midx - 1, midy + 4), QPoint(midx + 6, midy - 5))
+        painter.end()
 
 
 class CraftingPage(QWidget):
@@ -74,6 +97,11 @@ class CraftingPage(QWidget):
             self.enchant.addItem(f"Enchantement .{enchant}", enchant)
         filters.addWidget(self.enchant)
         finder_col.addLayout(filters)
+        self.reset_search_button = QPushButton("↻  Réinitialiser la recherche")
+        self.reset_search_button.setObjectName("craftReset")
+        self.reset_search_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.reset_search_button.clicked.connect(self._reset_search_filters)
+        finder_col.addWidget(self.reset_search_button)
         self.found = QLabel()
         self.found.setObjectName("catalogueSubtitle")
         finder_col.addWidget(self.found)
@@ -94,7 +122,15 @@ class CraftingPage(QWidget):
         detail_col = QVBoxLayout(details)
         detail_col.setContentsMargins(17, 12, 17, 12)
         detail_col.setSpacing(7)
-        detail_col.addWidget(self._label("RECETTE ET RENTABILITÉ", "detailCaption"))
+        detail_header = QHBoxLayout()
+        detail_header.addWidget(self._label("RECETTE ET RENTABILITÉ", "detailCaption"))
+        detail_header.addStretch(1)
+        self.reset_profit_button = QPushButton("↻  Réinitialiser la rentabilité")
+        self.reset_profit_button.setObjectName("craftReset")
+        self.reset_profit_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.reset_profit_button.clicked.connect(self._reset_profitability)
+        detail_header.addWidget(self.reset_profit_button)
+        detail_col.addLayout(detail_header)
         selected_row = QHBoxLayout()
         self.item_icon = QLabel()
         self.item_icon.setFixedSize(56, 56)
@@ -145,11 +181,18 @@ class CraftingPage(QWidget):
         fees_layout.setContentsMargins(15, 12, 15, 12)
         fees_layout.setVerticalSpacing(11)
         fees_layout.addWidget(self._label("TAXES ET BONUS", "detailCaption"), 0, 0, 1, 2)
-        self.market_tax = QCheckBox("Déduire 6,5 % sur la vente au marché")
+        self.market_tax = GoldCheckBox("Déduire 6,5 % sur la vente au marché")
         self.market_tax.setObjectName("craftCheckbox")
         self.market_tax.setChecked(self.preferences.value("craft/market_tax", False, type=bool))
         self.market_tax.toggled.connect(self._options_changed)
-        fees_layout.addWidget(self.market_tax, 1, 0, 1, 2)
+        tax_line = QHBoxLayout()
+        tax_line.addWidget(self.market_tax)
+        self.tax_status = QLabel()
+        self.tax_status.setObjectName("craftTaxStatus")
+        tax_line.addWidget(self.tax_status)
+        tax_line.addStretch(1)
+        fees_layout.addLayout(tax_line, 1, 0, 1, 2)
+        self._update_tax_status()
         fees_layout.addWidget(self._label("Coût d'artisan par fabrication", "craftField"), 2, 0)
         self.artisan_fee = self._price_input("Coût de l'artisan par fabrication")
         self.artisan_fee.setValue(int(self.preferences.value("craft/artisan_fee", 0)))
@@ -398,6 +441,41 @@ class CraftingPage(QWidget):
         self.target_units._visible_editor.setText(str(self.target_units.value()))
         self._recalculate()
 
+    def _reset_search_filters(self):
+        """Clear only object-search criteria, preserving the selected craft."""
+        self.search_delay.stop()
+        self.search.blockSignals(True)
+        self.tier.blockSignals(True)
+        self.enchant.blockSignals(True)
+        self.search.clear()
+        self.tier.setCurrentIndex(0)
+        self.enchant.setCurrentIndex(0)
+        self.search.blockSignals(False)
+        self.tier.blockSignals(False)
+        self.enchant.blockSignals(False)
+        self._refresh_search()
+
+    def _reset_profitability(self):
+        """Clear the active simulation, including the remembered input prices."""
+        for control in self.material_inputs.values():
+            control.setValue(0)
+        self.sale_price.setValue(0)
+        recipe = self.recipes.by_id[self.selected.item_id] if self.selected else None
+        self.target_units.setValue(recipe.output_amount if recipe else 1)
+        # Resetting cost/return/tax is intentional, but the object and search
+        # filters stay untouched so the user can start a new calculation.
+        self.artisan_fee.setValue(0)
+        self.return_rate.setValue(0)
+        self.market_tax.setChecked(False)
+        self._recalculate()
+
+    def _update_tax_status(self):
+        enabled = self.market_tax.isChecked()
+        self.tax_status.setText("✓ ACTIVÉE" if enabled else "DÉSACTIVÉE")
+        self.tax_status.setProperty("taxActive", enabled)
+        self.tax_status.style().unpolish(self.tax_status)
+        self.tax_status.style().polish(self.tax_status)
+
     def _material_price_changed(self, key, value):
         self.preferences.setValue(f"craft/material/{key}", value)
         self._recalculate()
@@ -408,6 +486,7 @@ class CraftingPage(QWidget):
         self._recalculate()
 
     def _options_changed(self, *_):
+        self._update_tax_status()
         self.preferences.setValue("craft/market_tax", self.market_tax.isChecked())
         self.preferences.setValue("craft/artisan_fee", self.artisan_fee.value())
         self.preferences.setValue("craft/return_rate", self.return_rate.value())
