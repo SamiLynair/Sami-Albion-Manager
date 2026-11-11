@@ -238,7 +238,7 @@ class WorkshopWindow(QMainWindow):
         tools_label.setFont(QFont("Segoe UI", 10, QFont.Weight.DemiBold))
         side_col.addWidget(tools_label)
 
-        self.catalogue_button = QPushButton("◈   Catalogue d'objets")
+        self.catalogue_button = QPushButton("📦   Catalogue d'objets")
         self.catalogue_button.setObjectName("nav")
         self.catalogue_button.setProperty("active", "true")
         self.catalogue_button.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -252,7 +252,7 @@ class WorkshopWindow(QMainWindow):
         side_col.addWidget(self.crafting_button)
         side_col.addStretch(1)
 
-        self.drawer_button = QPushButton("▾   Calculatrice")
+        self.drawer_button = QPushButton("🧮   Calculatrice")
         self.drawer_button.setObjectName("drawerToggle")
         self.drawer_button.setProperty("active", False)
         self.drawer_button.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -397,7 +397,7 @@ class WorkshopWindow(QMainWindow):
     def toggle_calculator(self, checked=False, *, animate=True):
         opening = not self.expanded
         self.expanded = opening
-        self.drawer_button.setText("▴   Calculatrice" if opening else "▾   Calculatrice")
+        self.drawer_button.setText("▴  🧮  Calculatrice" if opening else "▾  🧮  Calculatrice")
         self.drawer_button.setProperty("active", opening)
         self.drawer_button.style().unpolish(self.drawer_button)
         self.drawer_button.style().polish(self.drawer_button)
