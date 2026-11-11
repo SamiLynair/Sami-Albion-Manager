@@ -160,3 +160,7 @@ QPushButton#craftStepButton { background: #62492f; color: #f7e1b4; border: 1px s
 QPushButton#craftStepButton:hover { background: #84623e; color: #fff4dd; border-color: #dfb875; }
 QPushButton#craftStepButton:pressed { background: #ad854e; color: #21180f; }
 QPushButton#craftStepButton:disabled { background: #453c33; color: #8c816e; border-color: #6a5944; }
+
+/* v0.4.4: separate visible craft inputs (not Qt's embedded spinbox editor). */
+QLabel#craftNumberUnit { color: #dfc89d; background: transparent; font-size: 10px; padding: 0 3px; }
+QFrame#craftPricePanel QLabel#craftNumberUnit { color: #5d412b; }
