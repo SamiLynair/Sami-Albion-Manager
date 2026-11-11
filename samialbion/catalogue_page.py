@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QAbstractTableModel, QModelIndex, QPoint, QSize, Qt, QTimer
-from PySide6.QtGui import QColor, QIcon, QPainter
+from PySide6.QtGui import QColor, QIcon, QPainter, QPolygon
 from PySide6.QtWidgets import (
     QAbstractItemView, QApplication, QComboBox, QFrame, QGridLayout,
     QHeaderView, QHBoxLayout, QLabel, QLineEdit, QMenu, QPushButton,
@@ -35,6 +35,21 @@ def _market_order(options, preferred):
 
 class MarketFilterComboBox(QComboBox):
     """Use the exact same compact QMenu styling as the category hierarchy."""
+
+    def paintEvent(self, event):
+        super().paintEvent(event)
+        # Draw the same small down-chevron on every market filter, regardless
+        # of native Windows/Qt theme arrow support.
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(QColor("#866342"))
+        cx, cy = self.width() - 15, self.height() // 2
+        painter.drawPolygon(QPolygon([
+            QPoint(cx - 5, cy - 2), QPoint(cx + 5, cy - 2),
+            QPoint(cx, cy + 3),
+        ]))
+        painter.end()
 
     def _popup_menu(self) -> QMenu:
         menu = QMenu(self)
