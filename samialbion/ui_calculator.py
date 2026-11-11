@@ -252,7 +252,7 @@ class WorkshopWindow(QMainWindow):
         side_col.addWidget(self.crafting_button)
         side_col.addStretch(1)
 
-        self.drawer_button = QPushButton("🧮   Calculatrice")
+        self.drawer_button = QPushButton("▾  🧮  Calculatrice")
         self.drawer_button.setObjectName("drawerToggle")
         self.drawer_button.setProperty("active", False)
         self.drawer_button.setCursor(Qt.CursorShape.PointingHandCursor)
