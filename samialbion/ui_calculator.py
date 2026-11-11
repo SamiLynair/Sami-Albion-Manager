@@ -117,10 +117,10 @@ class TavernBanner(QWidget):
         small_title = QFont("Segoe UI", 11, QFont.Weight.DemiBold)
         small_title.setLetterSpacing(QFont.SpacingType.AbsoluteSpacing, 0.6)
         painter.setFont(small_title)
-        painter.drawText(30, 31, "✦  CARNET D'ARTISAN  ·  ROYAUME D'ALBION")
+        
         painter.setFont(display_font(24, bold=True, tracking=0.4))
         painter.setPen(QColor("#f9e9c8"))
-        painter.drawText(30, min(97, self.height() - 23), "LE COMPTOIR DU RÉCOLTEUR")
+        painter.drawText(30, min(97, self.height() - 23), "Mon carnet d’artisan")
         painter.end()
 
 
@@ -191,7 +191,7 @@ class WorkshopWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         load_display_fonts()
-        self.setWindowTitle(f"Sami Albion Manager · {__version__} — Le Comptoir du Récolteur")
+        self.setWindowTitle(f"Sami Albion Manager · {__version__}")
         self.resize(1370, 870)
         self.setMinimumSize(1050, 720)
         self.expanded = False
@@ -221,7 +221,7 @@ class WorkshopWindow(QMainWindow):
         brand = QFrame()
         brand.setObjectName("sideBrand")
         brand_col = QVBoxLayout(brand)
-        brand_col.setContentsMargins(9, 9, 3, 23)
+        brand_col.setContentsMargins(9, 9, 9, 9)
         brand_col.setSpacing(2)
         brand_title = QLabel("✦  SAMI")
         brand_title.setObjectName("brand")
@@ -268,7 +268,7 @@ class WorkshopWindow(QMainWindow):
         self.drawer_anim.setEasingCurve(QEasingCurve.Type.OutCubic)
         self.drawer_anim.finished.connect(self._finish_animation)
 
-        europe = QLabel("●  SERVEUR EUROPE")
+        europe = QLabel("SERVEUR EUROPE")
         europe.setObjectName("pill")
         europe.setFont(QFont("Segoe UI", 10, QFont.Weight.DemiBold))
         europe.setAlignment(Qt.AlignmentFlag.AlignCenter)
