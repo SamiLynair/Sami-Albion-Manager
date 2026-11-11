@@ -1,0 +1,65 @@
+name: Compiler et publier Sami Albion Manager
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  windows-release:
+    runs-on: windows-latest
+    steps:
+      - name: Récupérer le projet
+        uses: actions/checkout@v6
+
+      - name: Installer Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Installer Qt et PyInstaller
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "PySide6-Essentials>=6.12,<6.13" pyinstaller
+
+      - name: Vérifier le numéro de version
+        shell: pwsh
+        run: |
+          $version = python -c "from samialbion import __version__; print(__version__)"
+          if ("v$version" -ne $env:GITHUB_REF_NAME) { throw "Tag Git différent de la version du programme" }
+
+      - name: Tests automatiques
+        env:
+          QT_QPA_PLATFORM: offscreen
+          SAMI_DISABLE_UPDATE_CHECK: "1"
+        run: python -m unittest discover -s tests -v
+
+      - name: Compiler l'application Windows
+        shell: pwsh
+        run: |
+          $args = @(
+            "--noconfirm", "--clean", "--onefile", "--windowed",
+            "--name", "Sami Albion Manager",
+            "--icon", "samialbion.ico",
+            "--add-data", "samialbion.ico;.",
+            "--add-data", "samialbion/assets/tavern.qss;samialbion/assets",
+            "--add-data", "samialbion/assets/header_recolte.jpg;samialbion/assets",
+            "--add-data", "samialbion/assets/catalog.json.gz;samialbion/assets",
+            "--add-data", "samialbion/assets/market_shop_index.json.gz;samialbion/assets",
+            "--add-data", "samialbion/assets/item_icons.zip;samialbion/assets",
+            "--add-data", "samialbion/assets/item_icons_manifest.json;samialbion/assets",
+            "--add-data", "samialbion/assets/fonts;samialbion/assets/fonts",
+            "app.py"
+          )
+          python -m PyInstaller @args
+          Copy-Item "dist/Sami Albion Manager.exe" "dist/Sami-Albion-Manager-Windows.exe"
+
+      - name: Publier la nouvelle version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          gh release create "${{ github.ref_name }}" "dist/Sami-Albion-Manager-Windows.exe" --title "${{ github.ref_name }}" --generate-notes --verify-tag

@@ -1,0 +1,115 @@
+/* Sami Albion Manager — offline artisan's catalogue, v0.3.2 */
+QWidget#root { background: #151a17; color: #f2e6cd; }
+QWidget { font-family: "Segoe UI"; color: #eadfc8; font-size: 12px; }
+QWidget#pageBody { background: transparent; }
+QFrame#sideBar { background: #181d19; border-right: 1px solid #4b4331; }
+QFrame#sideBrand { background: transparent; border-bottom: 1px solid #564832; }
+QFrame#panel { background: #222822; border: 1px solid #4d4937; border-radius: 14px; }
+QFrame#panelWarm { background: #29291f; border: 1px solid #67533a; border-radius: 14px; }
+QFrame#metric { background: #252b23; border: 1px solid #514934; border-radius: 13px; }
+QLabel#brand { font-family: "Noto Serif"; font-size: 23px; font-weight: bold; color: #f0c77f; }
+QLabel#brandSub { font-family: "Segoe UI"; color: #c4b897; font-size: 11px; font-weight: 600; }
+QLabel#pageTitle { font-family: "Noto Serif"; font-size: 27px; font-weight: bold; color: #f4e3bf; }
+QLabel#pageSub { color: #b4ad98; font-size: 11px; }
+QLabel#sectionTitle { font-family: "Noto Serif"; font-size: 16px; font-weight: bold; color: #e9c384; }
+QLabel#fieldCaption { font-family: "Segoe UI"; font-size: 11px; font-weight: 600; color: #c4b493; }
+QLabel#metricTitle { color: #bbb497; font-size: 10px; font-weight: bold; }
+QLabel#metricValue { color: #f9edcc; font-size: 20px; font-weight: bold; }
+QLabel#metricHint { color: #a6ab98; font-size: 10px; }
+QLabel#smallNote { color: #a5a58f; font-size: 10px; }
+QLabel#pill { font-family: "Segoe UI"; background: #364032; border: 1px solid #718164; border-radius: 9px; padding: 5px 11px; color: #c4d5a7; font-size: 11px; font-weight: 600; }
+QLabel#woodPill { background: #473725; border: 1px solid #977548; border-radius: 9px; padding: 5px 11px; color: #e5c48a; font-size: 10px; font-weight: bold; }
+QLabel#footerAuthor { color: #ede8df; font-family: "Segoe UI"; font-size: 12px; }
+QLabel#footerVersion { color: #38a9ee; font-family: "Segoe UI"; font-size: 12px; }
+QLabel#selectedHint { color: #a8b99b; font-size: 10px; }
+
+QPushButton { outline: none; }
+QPushButton#nav { background: transparent; border: 1px solid transparent; border-radius: 10px; color: #b6b8a8; font-size: 12px; text-align: left; padding: 13px 16px; }
+QPushButton#nav:hover { background: #30372d; color: #f8e3b5; }
+QPushButton#nav[active="true"] { background: #3b402e; border: 1px solid #7a6945; color: #f3d296; font-weight: bold; }
+QPushButton#navSecondary { background: transparent; border: 1px solid transparent; border-radius: 10px; color: #c4bca6; font-size: 12px; text-align: left; padding: 11px 16px; }
+QPushButton#navSecondary:hover { background: #30372d; border-color: #65583f; color: #f8dba2; }
+QPushButton#navSecondary:disabled { color: #8c907f; }
+QPushButton#primary { background: #dcb36d; color: #2a261c; border: 1px solid #efd096; border-radius: 9px; padding: 11px 16px; font-weight: bold; font-size: 11px; }
+QPushButton#primary:hover { background: #f0ca89; border-color: #ffe6a5; }
+QPushButton#primary:pressed { background: #ba9354; }
+QPushButton#secondary { background: #343c32; color: #e4dabf; border: 1px solid #625a40; border-radius: 9px; padding: 10px 15px; font-weight: bold; }
+QPushButton#secondary:hover { background: #434b3d; border-color: #ad945f; }
+QPushButton#quiet { background: transparent; color: #c3b18d; border: 1px solid #534b37; border-radius: 8px; padding: 8px 14px; }
+QPushButton#quiet:hover { color: #f6d698; border-color: #92764b; background: #302b23; }
+QPushButton:disabled { background: #3c4038; color: #86897d; border-color: #55594e; }
+
+QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox { background: #171e1a; color: #f3e6c9; selection-background-color: #887047; border: 1px solid #686048; border-radius: 8px; padding: 9px 11px; min-height: 20px; }
+QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus { border: 1px solid #e4ba75; background: #1f261f; }
+QLineEdit::placeholder { color: #858e81; }
+QComboBox::drop-down { border: none; width: 25px; }
+QComboBox::down-arrow { image: none; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid #d9b977; width: 0; height: 0; margin-right: 12px; }
+QComboBox QAbstractItemView { background: #252c24; color: #f1e2c1; border: 1px solid #786947; selection-background-color: #555a3e; outline: none; padding: 4px; }
+QSpinBox::up-button, QSpinBox::down-button, QDoubleSpinBox::up-button, QDoubleSpinBox::down-button { width: 17px; background: #323b30; border: 0px; }
+QSpinBox::up-arrow, QDoubleSpinBox::up-arrow { image: none; border-left: 3px solid transparent; border-right: 3px solid transparent; border-bottom: 4px solid #cfad78; width: 0; height: 0; }
+QSpinBox::down-arrow, QDoubleSpinBox::down-arrow { image: none; border-left: 3px solid transparent; border-right: 3px solid transparent; border-top: 4px solid #cfad78; width: 0; height: 0; }
+
+QListWidget#suggestions { background: #262e26; color: #e8debf; border: 1px solid #85704d; border-radius: 9px; outline: 0; padding: 4px; }
+QListWidget#suggestions::item { padding: 8px 9px; border-radius: 5px; }
+QListWidget#suggestions::item:hover { background: #465441; }
+QListWidget#suggestions::item:selected { background: #566544; color: #fff2ca; }
+
+QTableWidget { background: #202821; alternate-background-color: #252e26; color: #ede4d0; border: 1px solid #4e523e; border-radius: 9px; gridline-color: #354034; outline: none; selection-background-color: #475841; selection-color: #fff1d2; }
+QTableWidget::item { padding: 8px; border-bottom: 1px solid #394437; }
+QHeaderView::section { background: #313b2e; color: #e4c58c; font-weight: bold; border: none; border-bottom: 1px solid #6a6347; padding: 10px 7px; }
+QScrollBar:vertical { background: #1b241f; width: 9px; margin: 1px; }
+QScrollBar::handle:vertical { background: #665d45; border-radius: 4px; min-height: 25px; }
+QScrollBar::handle:vertical:hover { background: #a58b5c; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
+QScrollBar:horizontal { background: #1b241f; height: 8px; }
+QScrollBar::handle:horizontal { background: #665d45; border-radius: 4px; }
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal { width: 0px; }
+
+/* Clean-slate workshop and compact arithmetic drawer. */
+QFrame#emptyWorkbench { background: #1d241f; border: 1px solid #4c4b38; border-radius: 16px; }
+QLabel#emptySymbol { color: #b39362; font-family: Georgia; font-size: 37px; }
+QLabel#emptyTitle { font-family: "Noto Serif"; font-size: 25px; color: #edd3a2; font-weight: bold; }
+QPushButton#drawerToggle { font-family: "Segoe UI"; background: #3b402e; color: #f0cf91; border: 1px solid #83704a; border-radius: 8px; padding: 6px 11px; font-size: 12px; font-weight: 600; text-align: left; }
+QPushButton#drawerToggle:hover { background: #4a523a; border-color: #d1ae72; }
+QPushButton#drawerToggle[active="false"] { background: #292f27; color: #c5b793; }
+QFrame#calcDrawer { background: #292920; border: 1px solid #655239; border-radius: 10px; }
+QFrame#calcDisplay { background: #171d19; border: 1px solid #675a3e; border-radius: 7px; }
+QLabel#calcHistory { font-size: 9px; color: #a9a991; }
+QLabel#calcValue { font-size: 21px; font-weight: bold; color: #f2e1be; }
+QPushButton#calcNumber, QPushButton#calcOperator, QPushButton#calcUtility, QPushButton#calcEquals { border-radius: 6px; font-size: 12px; font-weight: bold; padding: 2px; }
+QPushButton#calcNumber { background: #3c4438; color: #f2e6cd; border: 1px solid #59644f; }
+QPushButton#calcNumber:hover { background: #55614c; border-color: #8e9e7d; }
+QPushButton#calcUtility { background: #3e382b; color: #e4c991; border: 1px solid #776748; }
+QPushButton#calcUtility:hover { background: #594b33; }
+QPushButton#calcOperator { background: #524831; color: #f1d59f; border: 1px solid #89714c; }
+QPushButton#calcOperator:hover { background: #6a593b; }
+QPushButton#calcEquals { background: #dfb775; color: #29251b; border: 1px solid #ffe0a0; }
+QPushButton#calcEquals:hover { background: #f1cf8c; }
+QPushButton#calcNumber:pressed, QPushButton#calcOperator:pressed, QPushButton#calcUtility:pressed, QPushButton#calcEquals:pressed { background: #a98d60; color: #241e16; }
+
+/* Offline item catalogue: readable, quiet, and consistent with the workshop. */
+QLabel#catalogueTitle { font-family: "Noto Serif"; font-size: 23px; font-weight: bold; color: #f0d5a5; }
+QLabel#catalogueSubtitle { color: #b6b6a3; font-size: 11px; }
+QLabel#catalogueCount { color: #e4c183; font-size: 12px; font-weight: 600; }
+QFrame#catalogueFilters { background: #202822; border: 1px solid #5a533e; border-radius: 12px; }
+QLineEdit#catalogueSearch { background: #171f1a; border-radius: 8px; padding-left: 12px; color: #f0e5cf; font-size: 13px; }
+QComboBox#catalogueFilter { background: #2b352c; color: #f2e4c5; border: 1px solid #6f684b; border-radius: 8px; padding: 6px 10px; font-size: 11px; }
+QComboBox#catalogueFilter:hover { background: #344232; border-color: #b99a64; }
+QTableView#itemsTable { background: #202821; alternate-background-color: #253027; border: 1px solid #5a553f; border-radius: 10px; color: #ebdfc8; gridline-color: #3a4638; font-size: 12px; outline: none; }
+QTableView#itemsTable::item { padding: 3px 8px; border: none; }
+QTableView#itemsTable::item:selected { background: #cbd4c6; color: #18231b; }
+QFrame#itemDetail { background: #272d24; border: 1px solid #66563a; border-radius: 12px; }
+QLabel#detailCaption { font-family: "Noto Serif"; font-size: 12px; font-weight: bold; color: #dfbc7f; }
+QLabel#detailName { font-family: "Noto Serif"; color: #f3dcae; font-size: 17px; font-weight: bold; }
+QLabel#detailData { color: #cbd0be; font-family: "Segoe UI"; font-size: 11px; }
+QLabel#offlineNote { color: #a4b69c; font-size: 10px; }
+
+/* Market-style, three-tier submenus with calm selection highlights. */
+QPushButton#marketCategoryButton { background: #2b352c; color: #f2e4c5; border: 1px solid #6f684b; border-radius: 8px; padding: 7px 11px; font-size: 11px; text-align: left; }
+QPushButton#marketCategoryButton:hover { background: #344232; border-color: #b99a64; }
+QPushButton#marketCategoryButton::menu-indicator { subcontrol-origin: padding; subcontrol-position: center right; width: 14px; height: 12px; }
+QMenu#marketMenu { background: #3d3529; color: #f3e4c9; border: 1px solid #947653; padding: 3px; font-family: "Segoe UI"; font-size: 11px; }
+QMenu#marketMenu::item { padding: 4px 16px 4px 8px; margin: 0; border-radius: 3px; }
+QMenu#marketMenu::item:selected { background: #81704e; color: #fff4d9; }
+QMenu#marketMenu::item:disabled { color: #918775; }
+QMenu#marketMenu::separator { height: 1px; background: #6b6048; margin: 3px 6px; }
