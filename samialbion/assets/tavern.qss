@@ -3,7 +3,7 @@ QWidget#root { background: #151a17; color: #f2e6cd; }
 QWidget { font-family: "Segoe UI"; color: #eadfc8; font-size: 12px; }
 QWidget#pageBody { background: transparent; }
 QFrame#sideBar { background: qlineargradient(x1:0,y1:0,x2:1,y2:1,stop:0 #2d231c,stop:0.55 #241c17,stop:1 #191613); border-right: 2px solid #765733; }
-QFrame#sideBrand { background: qlineargradient(x1:0,y1:0,x2:1,y2:0,stop:0 #35271d,stop:1 #251d17); border: 1px solid #60482e; border-bottom: 2px solid #b08145; border-radius: 8px; }
+QFrame#sideBrand { background: qlineargradient(x1:0,y1:0,x2:1,y2:0,stop:0 #35271d,stop:1 #251d17); border: 1px solid #84623e; border-radius: 8px; }
 QFrame#panel { background: #222822; border: 1px solid #4d4937; border-radius: 14px; }
 QFrame#panelWarm { background: #29291f; border: 1px solid #67533a; border-radius: 14px; }
 QFrame#metric { background: #252b23; border: 1px solid #514934; border-radius: 13px; }
@@ -152,7 +152,11 @@ QComboBox#catalogueFilter::drop-down, QComboBox#craftFilter::drop-down {
     border: none; background: transparent; width: 24px;
 }
 QComboBox#catalogueFilter::down-arrow, QComboBox#craftFilter::down-arrow {
-    image: none; width: 0px; height: 0px;
+    image: none; border: none; border-top: none; border-bottom: none;
+    border-left: none; border-right: none; margin: 0px; width: 0px; height: 0px;
+}
+QComboBox#catalogueFilter::drop-down, QComboBox#craftFilter::drop-down {
+    background: transparent; border: 0px; width: 0px;
 }
 QPushButton#craftReset {
     background: #49382a; color: #f2d5a1; border: 1px solid #9e7b4e;
