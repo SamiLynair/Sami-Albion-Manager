@@ -147,6 +147,29 @@ QListWidget#craftResults { background: #e5d7c4; alternate-background-color: #d9c
 QListWidget#craftResults::item { color: #493424; min-height: 44px; padding: 4px; border-bottom: 1px solid #c7b59d; }
 QListWidget#craftResults::item:selected { background: #e4c98f; color: #33271d; }
 QListWidget#craftResults::item:hover { background: #efd6a7; }
+/* Identical compact arrow area for catalogue and craft dropdowns. */
+QComboBox#catalogueFilter::drop-down, QComboBox#craftFilter::drop-down {
+    border: none; background: transparent; width: 24px;
+}
+QComboBox#catalogueFilter::down-arrow, QComboBox#craftFilter::down-arrow {
+    image: none; width: 0px; height: 0px;
+}
+QPushButton#craftReset {
+    background: #49382a; color: #f2d5a1; border: 1px solid #9e7b4e;
+    border-radius: 7px; padding: 6px 11px; font-size: 11px; font-weight: 600;
+}
+QPushButton#craftReset:hover { background: #745430; color: #fff0cd; border-color: #e0b976; }
+QPushButton#craftReset:pressed { background: #987444; color: #281b12; }
+QLabel#craftTaxStatus {
+    background: #463a2b; color: #d1bd9b; border: 1px solid #8a6d47;
+    border-radius: 5px; padding: 4px 8px; font-size: 10px; font-weight: bold;
+}
+QLabel#craftTaxStatus[taxActive="true"] {
+    background: #ebc57b; color: #302214; border: 1px solid #fff0bd;
+}
+QCheckBox#craftCheckbox::indicator:checked {
+    background: #ebc57b; border: 2px solid #fff0bd;
+}
 QComboBox#craftFilter { background: #e2d2b7; color: #422f24; border: 1px solid #8d765a; border-radius: 11px; padding: 7px; }
 QComboBox#craftFilter QAbstractItemView { background: #3d3529; color: #f3e4c9; selection-background-color: #81704e; }
 QSpinBox#craftNumber { background: #e8d7bd; color: #422f24; border: 1px solid #8d765a; border-radius: 8px; padding: 7px 9px; min-width: 115px; }
