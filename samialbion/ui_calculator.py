@@ -12,7 +12,7 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import (
     QApplication, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel, QLineEdit,
-    QMainWindow, QPushButton, QVBoxLayout, QWidget,
+    QMainWindow, QPushButton, QStackedWidget, QVBoxLayout, QWidget,
 )
 
 from . import __version__
@@ -234,16 +234,12 @@ class WorkshopWindow(QMainWindow):
         tools_label.setFont(QFont("Segoe UI", 10, QFont.Weight.DemiBold))
         side_col.addWidget(tools_label)
 
-        catalogue_button = QPushButton("◈   Catalogue d'objets")
-        catalogue_button.setObjectName("nav")
-        catalogue_button.setProperty("active", "true")
-        catalogue_button.setCursor(Qt.CursorShape.PointingHandCursor)
-        catalogue_button.clicked.connect(lambda: self.catalogue_page.search.setFocus())
-        side_col.addWidget(catalogue_button)
-        self.updates_button = QPushButton("↻   Mises à jour")
-        self.updates_button.setObjectName("navSecondary")
-        self.updates_button.setCursor(Qt.CursorShape.PointingHandCursor)
-        side_col.addWidget(self.updates_button)
+        self.catalogue_button = QPushButton("◈   Catalogue d'objets")
+        self.catalogue_button.setObjectName("nav")
+        self.catalogue_button.setProperty("active", "true")
+        self.catalogue_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.catalogue_button.clicked.connect(self.show_catalogue)
+        side_col.addWidget(self.catalogue_button)
         side_col.addStretch(1)
 
         self.drawer_button = QPushButton("▾   Calculatrice")
@@ -276,7 +272,20 @@ class WorkshopWindow(QMainWindow):
         self.author_label.setObjectName("footerAuthor")
         self.version_label = QLabel(f"v{__version__}")
         self.version_label.setObjectName("footerVersion")
-        footer_col.addWidget(self.author_label)
+        footer_row = QHBoxLayout()
+        footer_row.setContentsMargins(0, 0, 0, 0)
+        footer_row.setSpacing(4)
+        footer_row.addWidget(self.author_label)
+        footer_row.addStretch()
+        self.settings_button = QPushButton("⚙")
+        self.settings_button.setObjectName("settingsGear")
+        self.settings_button.setAccessibleName("Paramètres")
+        self.settings_button.setToolTip("Paramètres")
+        self.settings_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.settings_button.setFixedSize(30, 30)
+        self.settings_button.clicked.connect(self.show_settings)
+        footer_row.addWidget(self.settings_button)
+        footer_col.addLayout(footer_row)
         footer_col.addWidget(self.version_label)
         side_col.addWidget(footer)
         base.addWidget(sidebar)
@@ -289,9 +298,64 @@ class WorkshopWindow(QMainWindow):
         self.banner = TavernBanner()
         main_col.addWidget(self.banner)
 
+        self.pages = QStackedWidget()
         self.catalogue_page = CataloguePage()
-        main_col.addWidget(self.catalogue_page, 1)
+        self.pages.addWidget(self.catalogue_page)
+        self.settings_page = QWidget()
+        self.settings_page.setObjectName("settingsPage")
+        settings_col = QVBoxLayout(self.settings_page)
+        settings_col.setContentsMargins(0, 0, 0, 0)
+        settings_col.setSpacing(14)
+        title = QLabel("PARAMÈTRES")
+        title.setObjectName("catalogueTitle")
+        settings_col.addWidget(title)
+        subtitle = QLabel("Gérer les préférences et les mises à jour du logiciel")
+        subtitle.setObjectName("catalogueSubtitle")
+        settings_col.addWidget(subtitle)
+        update_panel = QFrame()
+        update_panel.setObjectName("settingsPanel")
+        update_col = QVBoxLayout(update_panel)
+        update_col.setContentsMargins(22, 20, 22, 20)
+        update_col.setSpacing(13)
+        update_title = QLabel("Mises à jour de l'application")
+        update_title.setObjectName("sectionTitle")
+        update_col.addWidget(update_title)
+        update_description = QLabel(
+            "Le logiciel recherche automatiquement les nouvelles versions au démarrage. "
+            "Tu peux également vérifier leur disponibilité ici."
+        )
+        update_description.setWordWrap(True)
+        update_description.setObjectName("catalogueSubtitle")
+        update_col.addWidget(update_description)
+        installed_version = QLabel(f"Version installée : v{__version__}")
+        installed_version.setObjectName("settingsVersion")
+        update_col.addWidget(installed_version)
+        self.updates_button = QPushButton("↻   Mises à jour")
+        self.updates_button.setObjectName("primary")
+        self.updates_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        update_col.addWidget(self.updates_button, 0, Qt.AlignmentFlag.AlignLeft)
+        settings_col.addWidget(update_panel)
+        settings_col.addStretch(1)
+        self.pages.addWidget(self.settings_page)
+        main_col.addWidget(self.pages, 1)
         base.addWidget(main, 1)
+
+    def _set_active_navigation(self, catalogue: bool):
+        self.catalogue_button.setProperty("active", "true" if catalogue else "false")
+        self.catalogue_button.style().unpolish(self.catalogue_button)
+        self.catalogue_button.style().polish(self.catalogue_button)
+        self.settings_button.setProperty("active", "false" if catalogue else "true")
+        self.settings_button.style().unpolish(self.settings_button)
+        self.settings_button.style().polish(self.settings_button)
+
+    def show_catalogue(self):
+        self.pages.setCurrentWidget(self.catalogue_page)
+        self._set_active_navigation(True)
+        self.catalogue_page.search.setFocus()
+
+    def show_settings(self):
+        self.pages.setCurrentWidget(self.settings_page)
+        self._set_active_navigation(False)
 
     def toggle_calculator(self, checked=False, *, animate=True):
         opening = not self.expanded

@@ -33,9 +33,22 @@ class CatalogueUITests(unittest.TestCase):
         self.page.close()
 
     def test_all_items_visible_and_offline_icon_loads(self):
-        self.assertGreaterEqual(self.page.model.rowCount(), 12000)
+        self.assertGreaterEqual(self.page.model.rowCount(), 11000)
         self.assertGreater(self.page.icons.count, 0)
         self.assertTrue(self.page.icons.has_icon("T4_MAIN_SWORD"))
+
+    def test_technical_identifiers_and_footer_note_are_hidden(self):
+        self.page._select_market_path(("Fabrication", "Ressources brutes", "Minerai"))
+        self.page.tier.setCurrentIndex(4)
+        self.page._refresh()
+        names = [self.page.model.data(self.page.model.index(row, 0))
+                 for row in range(self.page.model.rowCount())]
+        self.assertNotIn("T4_ORE_LEVEL2", names)
+        self.assertFalse(any(name.startswith("T4_ORE_LEVEL") for name in names))
+        self.assertNotIn("ID :", self.page.detail_data.text())
+        self.assertFalse(hasattr(self.page, "image_info"))
+        self.assertNotIn("T4_ORE", str(self.page.model.data(
+            self.page.model.index(0, 0), Qt.ItemDataRole.ToolTipRole)))
 
     def test_search_and_quality_filter(self):
         self.page.search.setText("T4_MAIN_SWORD")

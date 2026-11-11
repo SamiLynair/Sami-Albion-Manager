@@ -88,6 +88,10 @@ class OfflineItemCatalog:
         for item_id, source_record in entries.items():
             name_fr = source_record.get("fr") or ""
             name_en = source_record.get("en") or ""
+            # Internal/duplicate variants without a localized item name are
+            # not market-ready catalogue rows (e.g. T4_ORE_LEVEL2).
+            if not name_fr.strip() and not name_en.strip():
+                continue
             tier_match = TIER_RE.match(item_id)
             enchant_match = ENCHANT_RE.search(item_id)
             level_match = LEVEL_RE.search(item_id)

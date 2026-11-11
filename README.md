@@ -1,18 +1,19 @@
-# Sami Albion Manager · V0.3.2
+# Sami Albion Manager · V0.3.3
 
 **Le Comptoir du Récolteur** est un logiciel Windows personnel pour Albion Online, intégralement utilisable hors ligne.
 
 ## Fonctions présentes
 
 - **Catalogue d'objets** : 12 503 références provenant d'un instantané du projet `ao-data/ao-bin-dumps` : équipements, ressources, matières raffinées, potions, nourriture, montures, agriculture, artefacts, mobilier et autres objets.
-- **Recherche française/anglaise** par nom ou par identifiant d'objet.
+- **Recherche française/anglaise** par nom d'objet. Les identifiants techniques ne sont pas affichés.
 - **Classement comme au marché d'Albion** : menu compact en trois niveaux, par exemple **Armes → Arc → Arc de guerre**, ou **Fabrication → Ressources raffinées → Lingot**. Les catégories et sous-catégories proviennent des données de jeu `items.xml` ; les familles d'objets sont déduites localement de leurs noms. Les nouveautés sans correspondance dans ces données utilisent des catégories de remplacement.
 - **Filtres** : catégorie, tier (T1 à T8), enchantement (.0 à .4) et qualité (normale à exceptionnelle) pour les équipements où elle s'applique.
 - **Sélection discrète** : la ligne de l'objet est mise en évidence sans recolorer son image.
 - **Recherche au clavier corrigée** : les touches Retour arrière et Supprimer fonctionnent normalement ; les raccourcis de la calculatrice ne s'activent que lorsque celle-ci est sélectionnée.
 - **Images des objets** : **11 803 illustrations** issues du service de rendu du jeu, récupérées une seule fois pendant le développement et enregistrées localement au format WEBP dans `samialbion/assets/item_icons.zip`. Les variantes de qualité réutilisent l'illustration de base et affichent un cadre coloré et le niveau choisi. Les 700 identifiants sans rendu disponible gardent un pictogramme « ? », jamais une fausse image.
 - **Calculatrice** fermée au démarrage : elle se déploie uniquement en cliquant sur son volet en bas de la barre latérale. Opérations courantes et utilisation au clavier.
-- **Mises à jour intégrées** : vérification discrète au démarrage et bouton « Mises à jour » dans la barre latérale. Si une nouvelle version Windows est publiée sur GitHub, le programme la télécharge, vérifie son empreinte SHA-256, se ferme et se relance après remplacement de son exécutable. Confirmation obligatoire avant le téléchargement. Aucun droit administrateur demandé pour une installation dans un dossier accessible en écriture.
+- **Paramètres** : roue crantée près de « Made by Sami », ouvrant une page dédiée qui héberge désormais le bouton « Mises à jour ». Vérification discrète au démarrage, téléchargement, contrôle SHA-256, remplacement et redémarrage lors d'une nouvelle version GitHub. Confirmation obligatoire avant le téléchargement.
+- **Catalogue épuré** : les entrées techniques sans nom d'objet sont masquées, tout comme les identifiants dans les infobulles et les fiches. La mention de bas de fiche a été supprimée.
 - **Signature** « Made by Sami », numéro de version en bleu et bandeau illustré du jeu.
 
 **Aucune connexion aux API d'Albion Online.** Aucun module de prix, de Black Market, de stockage boursier ou d'achat/vente n'est présent. Les données du catalogue restent entièrement locales. Seule la recherche d'une nouvelle version utilise Internet et l'API publique des *GitHub Releases* du dépôt `SamiLynair/Sami-Albion-Manager`.
@@ -22,13 +23,13 @@
 Une fois la **première version avec mise à jour intégrée** installée :
 
 1. Lance « Sami Albion Manager.exe » : une vérification de version se fait en arrière-plan.
-2. Si une nouvelle version est disponible, accepte ou refuse la proposition. Tu peux aussi cliquer sur « Mises à jour ».
+2. Si une nouvelle version est disponible, accepte ou refuse la proposition. Tu peux aussi cliquer sur la roue crantée, puis sur « Mises à jour » dans les Paramètres.
 3. Le téléchargement se fait dans un dossier temporaire. Le programme contrôle le SHA-256 publié par GitHub avant toute installation.
 4. Une copie du logiciel agit comme utilitaire de mise à jour : elle attend la fermeture de l'ancien programme, sauvegarde l'ancien exécutable, le remplace puis lance le nouveau.
 
 **À mettre en place une seule fois** : il faut d'abord publier sur GitHub une Release contenant l'exécutable Windows nommé `Sami-Albion-Manager-Windows.exe`. Tant que le dépôt n'a aucune Release, le bouton indique simplement qu'aucune mise à jour n'est disponible. L'installation automatisée ne fonctionne pas dans les sources Python, seulement dans l'exécutable Windows compilé.
 
-Le fichier `.github/workflows/windows-release.yml` est prévu pour compiler cet exécutable sur un runner Windows et publier une Release lorsqu'un tag Git correspondant à la version est créé (exemple : `v0.3.2`). L'intégration du dépôt et la première publication doivent être effectuées avant que les mises à jour soient utilisables de bout en bout.
+Le fichier `.github/workflows/windows-release.yml` compile cet exécutable sur un runner Windows et publie une Release lorsqu'un tag Git correspondant à la version est créé (exemple : `v0.3.3`).
 
 ## Installation / compilation Windows 11
 

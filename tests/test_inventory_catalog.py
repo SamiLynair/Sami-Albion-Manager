@@ -11,8 +11,14 @@ class OfflineCatalogTests(unittest.TestCase):
         cls.catalogue = OfflineItemCatalog()
 
     def test_catalogue_contains_all_saved_items(self):
-        self.assertGreaterEqual(len(self.catalogue.items), 12000)
+        self.assertGreaterEqual(len(self.catalogue.items), 11000)
         self.assertEqual(len(self.catalogue.by_id), len(self.catalogue.items))
+
+    def test_unnamed_technical_variants_are_not_displayed(self):
+        self.assertNotIn("T4_ORE_LEVEL2", self.catalogue.by_id)
+        self.assertTrue(all(item.name_fr or item.name_en for item in self.catalogue.items))
+        named = self.catalogue.by_id["T8_ORE_LEVEL1@1"]
+        self.assertIn("Minerai", named.name_fr)
 
     def test_equipment_and_raw_resource_categories(self):
         self.assertEqual(item_category("T4_MAIN_SWORD"), "Équipements")

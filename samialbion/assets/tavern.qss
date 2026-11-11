@@ -1,4 +1,4 @@
-/* Sami Albion Manager — offline artisan's catalogue, v0.3.2 */
+/* Sami Albion Manager — offline artisan's catalogue, v0.3.3 */
 QWidget#root { background: #151a17; color: #f2e6cd; }
 QWidget { font-family: "Segoe UI"; color: #eadfc8; font-size: 12px; }
 QWidget#pageBody { background: transparent; }
@@ -21,6 +21,10 @@ QLabel#pill { font-family: "Segoe UI"; background: #364032; border: 1px solid #7
 QLabel#woodPill { background: #473725; border: 1px solid #977548; border-radius: 9px; padding: 5px 11px; color: #e5c48a; font-size: 10px; font-weight: bold; }
 QLabel#footerAuthor { color: #ede8df; font-family: "Segoe UI"; font-size: 12px; }
 QLabel#footerVersion { color: #38a9ee; font-family: "Segoe UI"; font-size: 12px; }
+QPushButton#settingsGear { background: transparent; border: 1px solid transparent; border-radius: 7px; color: #cbbd9c; font-family: "Segoe UI Symbol"; font-size: 20px; padding: 0; }
+QPushButton#settingsGear:hover, QPushButton#settingsGear[active="true"] { background: #30372d; border-color: #756346; color: #f3d296; }
+QFrame#settingsPanel { background: #222822; border: 1px solid #61543c; border-radius: 13px; }
+QLabel#settingsVersion { color: #d7c49b; font-size: 12px; }
 QLabel#selectedHint { color: #a8b99b; font-size: 10px; }
 
 QPushButton { outline: none; }

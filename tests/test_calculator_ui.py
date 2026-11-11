@@ -60,6 +60,12 @@ class CalculatorUITests(unittest.TestCase):
     def test_github_updates_button_is_available(self):
         self.assertEqual(self.window.updates_button.text(), "↻   Mises à jour")
         self.assertIsNotNone(self.window.update_controller)
+        self.assertEqual(self.window.pages.currentWidget(), self.window.catalogue_page)
+        self.window.settings_button.click()
+        self.assertEqual(self.window.pages.currentWidget(), self.window.settings_page)
+        self.assertTrue(self.window.updates_button.isVisible())
+        self.window.catalogue_button.click()
+        self.assertEqual(self.window.pages.currentWidget(), self.window.catalogue_page)
 
     def test_clean_workshop_without_status_bar_or_descriptions(self):
         self.assertFalse(hasattr(self.window, "status"))

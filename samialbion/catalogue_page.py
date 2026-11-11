@@ -85,7 +85,7 @@ class ItemsTableModel(QAbstractTableModel):
         if role == Qt.ItemDataRole.TextAlignmentRole and column in (1, 2, 3):
             return Qt.AlignmentFlag.AlignCenter
         if role == Qt.ItemDataRole.ToolTipRole:
-            return f"{' › '.join(item.market_path)}\n{item.item_id}"
+            return " › ".join(item.market_path)
         return None
 
 
@@ -227,7 +227,7 @@ class CataloguePage(QWidget):
         filters_layout.setVerticalSpacing(8)
         self.search = QLineEdit()
         self.search.setObjectName("catalogueSearch")
-        self.search.setPlaceholderText("Rechercher un objet, une ressource ou un identifiant…")
+        self.search.setPlaceholderText("Rechercher un objet ou une ressource…")
         self.search.setMinimumHeight(39)
         filters_layout.addWidget(self.search, 0, 0, 1, 4)
         self.category_button = QPushButton("Toutes les catégories")
@@ -293,10 +293,6 @@ class CataloguePage(QWidget):
         self.detail_data.setObjectName("detailData")
         detail_col.addWidget(self.detail_data)
         detail_col.addStretch()
-        self.image_info = QLabel("Images intégrées au logiciel\nCatalogue utilisable hors ligne")
-        self.image_info.setObjectName("offlineNote")
-        self.image_info.setWordWrap(True)
-        detail_col.addWidget(self.image_info)
         body.addWidget(detail)
         layout.addLayout(body, 1)
 
@@ -326,7 +322,6 @@ class CataloguePage(QWidget):
             96, 96, QIcon.Mode.Normal))
         self.detail_name.setText(item.name)
         self.detail_data.setText(
-            f"ID : {item.item_id}\n\n"
             f"Catégorie : {item.market_path[0]}\n"
             f"Type : {item.market_path[1]}\n"
             f"Famille : {item.market_path[2]}\n"
