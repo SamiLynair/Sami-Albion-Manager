@@ -71,6 +71,20 @@ class CalculatorUITests(unittest.TestCase):
         self.window.catalogue_button.click()
         self.assertEqual(self.window.pages.currentWidget(), self.window.catalogue_page)
 
+    def test_clean_window_title_and_artisan_branding(self):
+        self.assertEqual(self.window.windowTitle(), f"Sami Albion Manager · {__version__}")
+        labels = [label.text() for label in self.window.findChildren(QLabel)]
+        self.assertIn("SERVEUR EUROPE", labels)
+        self.assertNotIn("●  SERVEUR EUROPE", labels)
+
+    def test_artisan_banner_only_shows_new_title(self):
+        import inspect
+        from samialbion.ui_calculator import TavernBanner
+        source = inspect.getsource(TavernBanner.paintEvent)
+        self.assertIn("Mon carnet d’artisan", source)
+        self.assertNotIn("LE COMPTOIR DU RÉCOLTEUR", source)
+        self.assertNotIn("CARNET D'ARTISAN  ·  ROYAUME D'ALBION", source)
+
     def test_crafting_table_can_select_recipe_and_calculate(self):
         self.window.crafting_button.click()
         self.assertEqual(self.window.pages.currentWidget(), self.window.crafting_page)
