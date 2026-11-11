@@ -9,7 +9,6 @@ QFrame#panelWarm { background: #29291f; border: 1px solid #67533a; border-radius
 QFrame#metric { background: #252b23; border: 1px solid #514934; border-radius: 13px; }
 QLabel#brand { font-family: "Noto Serif"; font-size: 23px; font-weight: bold; color: #f5d59a; }
 QLabel#brandSub { font-family: "Segoe UI"; color: #d2aa6b; font-size: 11px; font-weight: 600; letter-spacing: 1px; }
-QLabel#fanMadeBadge { color: #302215; background: #d4a951; border: 1px solid #f0cc7d; border-radius: 4px; font-size: 8px; font-weight: bold; padding: 3px 5px; }
 QFrame#sideBar QLabel#fieldCaption { color: #c79f61; font-size: 10px; font-weight: bold; }
 QLabel#pageTitle { font-family: "Noto Serif"; font-size: 27px; font-weight: bold; color: #f4e3bf; }
 QLabel#pageSub { color: #b4ad98; font-size: 11px; }
