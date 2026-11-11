@@ -154,6 +154,64 @@ class CalculatorUITests(unittest.TestCase):
         self.app.processEvents()
         self.assertEqual(editor.text(), str(page.sale_price.value()))
 
+    def test_craft_search_reset_does_not_clear_profitability(self):
+        self.window.crafting_button.click()
+        page = self.window.crafting_page
+        page.search.setText("épée large de l'adepte")
+        page.tier.setCurrentIndex(4)
+        page.enchant.setCurrentIndex(1)
+        page.sale_price.setValue(12345)
+        page.reset_search_button.click()
+        self.assertEqual(page.search.text(), "")
+        self.assertEqual(page.tier.currentIndex(), 0)
+        self.assertEqual(page.enchant.currentIndex(), 0)
+        self.assertEqual(page.sale_price.value(), 12345)
+
+    def test_profitability_reset_preserves_selected_item_and_filters(self):
+        self.window.crafting_button.click()
+        page = self.window.crafting_page
+        page.search.setText("épée large de l'adepte")
+        page._refresh_search()
+        row = next(i for i in range(page.results.count())
+                   if page.results.item(i).data(Qt.ItemDataRole.UserRole) == "T4_MAIN_SWORD")
+        page.results.setCurrentRow(row)
+        page.sale_price.setValue(14567)
+        page.target_units.setValue(30)
+        for price in page.material_inputs.values():
+            price.setValue(543)
+        page.market_tax.setChecked(True)
+        page.artisan_fee.setValue(900)
+        page.return_rate.setValue(35.5)
+        page.reset_profit_button.click()
+        self.assertEqual(page.selected.item_id, "T4_MAIN_SWORD")
+        self.assertEqual(page.search.text(), "épée large de l'adepte")
+        self.assertEqual(page.sale_price.value(), 0)
+        self.assertEqual(page.sale_price._visible_editor.text(), "0")
+        self.assertEqual(page.target_units.value(), 1)
+        self.assertTrue(all(price.value() == 0 for price in page.material_inputs.values()))
+        self.assertEqual(page.artisan_fee.value(), 0)
+        self.assertEqual(page.return_rate.value(), 0)
+        self.assertFalse(page.market_tax.isChecked())
+        self.assertEqual(page.tax_status.text(), "DÉSACTIVÉE")
+
+    def test_tax_checkbox_has_unambiguous_checked_status(self):
+        self.window.crafting_button.click()
+        page = self.window.crafting_page
+        page.market_tax.setChecked(False)
+        self.assertEqual(page.tax_status.text(), "DÉSACTIVÉE")
+        page.market_tax.setChecked(True)
+        self.assertEqual(page.tax_status.text(), "✓ ACTIVÉE")
+        self.assertTrue(page.tax_status.property("taxActive"))
+        page.market_tax.setChecked(False)
+
+    def test_market_filters_have_custom_dropdown_arrow(self):
+        self.window.crafting_button.click()
+        from samialbion.catalogue_page import MarketFilterComboBox
+        page = self.window.crafting_page
+        self.assertIsInstance(page.tier, MarketFilterComboBox)
+        self.assertIsInstance(page.enchant, MarketFilterComboBox)
+        self.assertTrue(page.tier.isEnabled())
+
     def test_selected_craft_icon_has_no_recolouring(self):
         self.window.crafting_button.click()
         page = self.window.crafting_page
