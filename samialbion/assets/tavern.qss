@@ -105,9 +105,6 @@ QPushButton#resetFilters:pressed { background: #897047; }
 QComboBox#catalogueFilter { background: #e2d2b7; color: #422f24; border: 1px solid #8d765a; border-radius: 15px; padding: 6px 12px; font-size: 11px; }
 QComboBox#catalogueFilter:hover { background: #f0e2c9; border-color: #d1a660; }
 QComboBox#catalogueFilter:focus { background: #f3e5cb; border-color: #c49c56; }
-QListView#cataloguePopup { background: #382c22; color: #fff0d5; border: 1px solid #b39462; font-size: 12px; outline: none; padding: 3px; selection-background-color: #9a794b; selection-color: #fff6e6; }
-QListView#cataloguePopup::item { color: #fff0d5; min-height: 25px; padding: 4px 9px; border: none; }
-QListView#cataloguePopup::item:hover, QListView#cataloguePopup::item:selected { background: #9a794b; color: #fff6e6; }
 QTableView#itemsTable { background: #e5d7c4; alternate-background-color: #d9c9b3; border: 3px solid #756048; border-radius: 5px; color: #493424; gridline-color: #b7a58d; font-size: 12px; outline: none; selection-background-color: #e4c98f; selection-color: #33271d; }
 QTableView#itemsTable::item { padding: 3px 8px; border: none; border-bottom: 1px solid #c7b59d; }
 QTableView#itemsTable::item:selected { background: #e4c98f; color: #33271d; }

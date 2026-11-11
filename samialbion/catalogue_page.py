@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from PySide6.QtCore import QAbstractTableModel, QModelIndex, QSize, Qt, QTimer
-from PySide6.QtGui import QColor, QIcon, QPainter, QPalette
+from PySide6.QtCore import QAbstractTableModel, QModelIndex, QPoint, QSize, Qt, QTimer
+from PySide6.QtGui import QColor, QIcon, QPainter
 from PySide6.QtWidgets import (
     QAbstractItemView, QApplication, QComboBox, QFrame, QGridLayout,
-    QHeaderView, QHBoxLayout, QLabel, QLineEdit, QListView, QMenu, QPushButton,
+    QHeaderView, QHBoxLayout, QLabel, QLineEdit, QMenu, QPushButton,
     QStyledItemDelegate, QStyle, QStyleOptionViewItem, QTableView,
     QVBoxLayout, QWidget,
 )
@@ -25,11 +25,33 @@ ARC_ORDER = (
     "Arc", "Arc long", "Arc de guerre", "Arc murmurant", "Arc gémissant",
     "Arc de Badon", "Perce-brume", "Arc Marche-ciel",
 )
+CATEGORY_INDENT = "\u00a0\u00a0\u00a0"
 
 
 def _market_order(options, preferred):
     priority = {name.casefold(): index for index, name in enumerate(preferred)}
     return sorted(options, key=lambda text: (priority.get(text.casefold(), len(priority)), text.casefold()))
+
+
+class MarketFilterComboBox(QComboBox):
+    """Use the exact same compact QMenu styling as the category hierarchy."""
+
+    def _popup_menu(self) -> QMenu:
+        menu = QMenu(self)
+        menu.setObjectName("marketMenu")
+        menu.setMinimumWidth(self.width())
+        for index in range(self.count()):
+            action = menu.addAction(self.itemText(index))
+            action.triggered.connect(lambda checked=False, selected=index:
+                                     self.setCurrentIndex(selected))
+        return menu
+
+    def showPopup(self):
+        menu = self._popup_menu()
+        try:
+            menu.exec(self.mapToGlobal(QPoint(0, self.height())))
+        finally:
+            menu.deleteLater()
 
 
 class ItemsTableModel(QAbstractTableModel):
@@ -136,18 +158,9 @@ class CataloguePage(QWidget):
         self._refresh()
 
     def _select(self, title: str, choices: list[tuple[str, object]]) -> QComboBox:
-        combo = QComboBox()
+        combo = MarketFilterComboBox()
         combo.setObjectName("catalogueFilter")
         combo.setMinimumHeight(37)
-        popup = QListView(combo)
-        popup.setObjectName("cataloguePopup")
-        palette = popup.palette()
-        palette.setColor(QPalette.ColorRole.Base, QColor("#382c22"))
-        palette.setColor(QPalette.ColorRole.Text, QColor("#fff0d5"))
-        palette.setColor(QPalette.ColorRole.Highlight, QColor("#9a794b"))
-        palette.setColor(QPalette.ColorRole.HighlightedText, QColor("#fff6e6"))
-        popup.setPalette(palette)
-        combo.setView(popup)
         for label, value in choices:
             combo.addItem(label, value)
         combo.setAccessibleName(title)
@@ -156,7 +169,7 @@ class CataloguePage(QWidget):
 
     def _select_market_path(self, selected: tuple[str, ...] | None):
         self.market_path = selected
-        self.category_button.setText(" › ".join(selected) if selected else "Toutes les catégories")
+        self.category_button.setText(CATEGORY_INDENT + (" › ".join(selected) if selected else "Toutes les catégories"))
         self.category_button.setToolTip(" › ".join(selected) if selected else "Afficher toutes les catégories")
         self._refresh()
 
@@ -246,7 +259,7 @@ class CataloguePage(QWidget):
         self.reset_button.setMinimumHeight(39)
         self.reset_button.clicked.connect(self.reset_filters)
         filters_layout.addWidget(self.reset_button, 0, 3)
-        self.category_button = QPushButton("Toutes les catégories")
+        self.category_button = QPushButton(CATEGORY_INDENT + "Toutes les catégories")
         self.category_button.setObjectName("marketCategoryButton")
         self.category_button.setMinimumHeight(37)
         self.category_button.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -323,7 +336,7 @@ class CataloguePage(QWidget):
             combo.setCurrentIndex(0)
             combo.blockSignals(False)
         self.market_path = None
-        self.category_button.setText("Toutes les catégories")
+        self.category_button.setText(CATEGORY_INDENT + "Toutes les catégories")
         self.category_button.setToolTip("Afficher toutes les catégories")
         self._refresh()
 

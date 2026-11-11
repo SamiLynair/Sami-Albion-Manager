@@ -9,7 +9,7 @@ try:
     from PySide6.QtCore import Qt
     from PySide6.QtGui import QPixmap
     from PySide6.QtWidgets import QApplication
-    from samialbion.catalogue_page import CataloguePage, NeutralIconDelegate
+    from samialbion.catalogue_page import CataloguePage, MarketFilterComboBox, NeutralIconDelegate
     from samialbion.ui_calculator import ASSETS
 except ImportError:
     QApplication = None
@@ -66,7 +66,7 @@ class CatalogueUITests(unittest.TestCase):
         self.page.reset_button.click()
         self.assertEqual(self.page.search.text(), "")
         self.assertIsNone(self.page.market_path)
-        self.assertEqual(self.page.category_button.text(), "Toutes les catégories")
+        self.assertEqual(self.page.category_button.text().strip(), "Toutes les catégories")
         self.assertTrue(all(combo.currentIndex() == 0 for combo in (
             self.page.tier, self.page.enchantment, self.page.quality)))
         self.assertEqual(self.page.model.rowCount(), len(self.page.catalogue.items))
@@ -92,8 +92,14 @@ class CatalogueUITests(unittest.TestCase):
 
     def test_filter_popups_have_readable_market_style(self):
         for combo in (self.page.tier, self.page.enchantment, self.page.quality):
-            self.assertEqual(combo.view().objectName(), "cataloguePopup")
+            self.assertIsInstance(combo, MarketFilterComboBox)
             self.assertGreater(combo.count(), 1)
+            menu = combo._popup_menu()
+            self.assertEqual(menu.objectName(), "marketMenu")
+            self.assertEqual(len(menu.actions()), combo.count())
+            menu.actions()[2].trigger()
+            self.assertEqual(combo.currentIndex(), 2)
+            menu.deleteLater()
 
     def test_selected_row_does_not_recolour_carrot_or_other_icons(self):
         for identifier in ("T1_CARROT", "T4_MAIN_SWORD"):
