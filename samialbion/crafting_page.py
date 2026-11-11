@@ -275,7 +275,14 @@ class CraftingPage(QWidget):
         selected_row = -1
         for position, item in enumerate(matching[:100]):
             label = f"{item.name}   ·   T{item.tier}.{item.enchantment}" if item.tier else item.name
-            row = QListWidgetItem(self.icons.icon(item.item_id).pixmap(40, 40, QIcon.Mode.Normal), label)
+            # Pin the same original image to Normal and Selected: otherwise Qt
+            # may synthesize a tinted overlay on the chosen item's icon.
+            original = self.icons.icon(item.item_id).pixmap(40, 40, QIcon.Mode.Normal)
+            neutral_icon = QIcon()
+            neutral_icon.addPixmap(original, QIcon.Mode.Normal)
+            neutral_icon.addPixmap(original, QIcon.Mode.Selected)
+            neutral_icon.addPixmap(original, QIcon.Mode.Active)
+            row = QListWidgetItem(neutral_icon, label)
             row.setData(Qt.ItemDataRole.UserRole, item.item_id)
             self.results.addItem(row)
             if item.item_id == selected_id:
