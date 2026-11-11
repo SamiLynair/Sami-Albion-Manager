@@ -222,6 +222,15 @@ class CraftingPage(QWidget):
     def _with_step_buttons(control):
         """Show compact, readable minus/plus buttons instead of native spin arrows."""
         control.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
+        # QSpinBox/QDoubleSpinBox embed a QLineEdit. The global QLineEdit
+        # theme otherwise paints its text in cream against parchment fields.
+        editor = control.lineEdit()
+        editor.setObjectName("craftNumberEditor")
+        editor.setStyleSheet(
+            "QLineEdit#craftNumberEditor { color: #422f24; "
+            "background: transparent; border: none; padding: 0px; "
+            "selection-color: #fff5df; selection-background-color: #8c6a42; }"
+        )
         holder = QWidget()
         row = QHBoxLayout(holder)
         row.setContentsMargins(0, 0, 0, 0)
