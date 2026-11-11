@@ -71,6 +71,27 @@ class CalculatorUITests(unittest.TestCase):
         self.window.catalogue_button.click()
         self.assertEqual(self.window.pages.currentWidget(), self.window.catalogue_page)
 
+    def test_crafting_table_can_select_recipe_and_calculate(self):
+        self.window.crafting_button.click()
+        self.assertEqual(self.window.pages.currentWidget(), self.window.crafting_page)
+        page = self.window.crafting_page
+        page.search.setText("épée large de l'adepte")
+        page._refresh_search()
+        self.assertGreater(page.results.count(), 0)
+        row = next(index for index in range(page.results.count())
+                   if page.results.item(index).data(Qt.ItemDataRole.UserRole) == "T4_MAIN_SWORD")
+        page.results.setCurrentRow(row)
+        self.assertEqual(page.selected.item_id, "T4_MAIN_SWORD")
+        self.assertEqual(len(page.material_inputs), 2)
+        page.material_inputs["T4_METALBAR"].setValue(100)
+        page.material_inputs["T4_LEATHER"].setValue(200)
+        page.sale_price.setValue(5000)
+        page.batches.setValue(2)
+        self.assertIn("3 600", page.profit.text())
+        self.assertIn("56.2", page.roi.text())
+        self.window.catalogue_button.click()
+        self.assertEqual(self.window.pages.currentWidget(), self.window.catalogue_page)
+
     def test_click_sound_can_be_disabled_in_settings(self):
         original = self.window.click_sound.enabled
         try:

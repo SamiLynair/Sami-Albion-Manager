@@ -1,10 +1,11 @@
-# Sami Albion Manager · V0.3.9
+# Sami Albion Manager · V0.4.0
 
 **Le Comptoir du Récolteur** est un logiciel Windows personnel pour Albion Online, intégralement utilisable hors ligne.
 
 ## Fonctions présentes
 
 - **Catalogue d'objets** : 12 503 références provenant d'un instantané du projet `ao-data/ao-bin-dumps` : équipements, ressources, matières raffinées, potions, nourriture, montures, agriculture, artefacts, mobilier et autres objets.
+- **Table de Craft (v0.4.0)** : nouvel onglet avec recherche d'objets craftables, filtrage par tier et enchantement, recettes intégrées hors ligne (8 859 recettes issues de `ao-data/ao-bin-dumps`), quantités nécessaires et images des ressources. Saisis manuellement les prix d'achat et de vente, et le nombre de fabrications pour calculer le coût, la recette, le bénéfice brut et la rentabilité. Les prix sont conservés sur ton PC. Les calculs n'incluent pas encore les frais de station, taxes et retours de ressources.
 - **Recherche française/anglaise** par nom d'objet. Les identifiants techniques ne sont pas affichés.
 - **Classement comme au marché d'Albion** : menu compact en trois niveaux, par exemple **Armes → Arc → Arc de guerre**, ou **Fabrication → Ressources raffinées → Lingot**. Les catégories et sous-catégories proviennent des données de jeu `items.xml` ; les familles d'objets sont déduites localement de leurs noms. Les nouveautés sans correspondance dans ces données utilisent des catégories de remplacement.
 - **Filtres** : catégorie, tier (T1 à T8), enchantement (.0 à .4) et qualité (normale à exceptionnelle) pour les équipements où elle s'applique.
@@ -54,7 +55,7 @@ Les images sont propriété de leurs ayants droit dans Albion Online. Le service
 
 Tes anciens stocks des premières versions, enregistrés sous `%APPDATA%\SamiAlbionManager\manager.db`, ne sont ni lus ni modifiés.
 
-Le numéro de version n'est modifié que sur demande explicite de Sami.
+Chaque nouvelle fonctionnalité finalisée et testée est publiée en version numérotée sur GitHub, conformément à la préférence de Sami.
 
 ## Vérification
 

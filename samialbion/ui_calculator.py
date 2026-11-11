@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
 from . import __version__
 from .calculator import Calculator
 from .catalogue_page import CataloguePage
+from .crafting_page import CraftingPage
 from .click_sound import ClickSound
 from .update_ui import UpdateController
 
@@ -243,6 +244,12 @@ class WorkshopWindow(QMainWindow):
         self.catalogue_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.catalogue_button.clicked.connect(self.show_catalogue)
         side_col.addWidget(self.catalogue_button)
+        self.crafting_button = QPushButton("⚒   Table de Craft")
+        self.crafting_button.setObjectName("nav")
+        self.crafting_button.setProperty("active", "false")
+        self.crafting_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.crafting_button.clicked.connect(self.show_crafting)
+        side_col.addWidget(self.crafting_button)
         side_col.addStretch(1)
 
         self.drawer_button = QPushButton("▾   Calculatrice")
@@ -304,6 +311,8 @@ class WorkshopWindow(QMainWindow):
         self.pages = QStackedWidget()
         self.catalogue_page = CataloguePage()
         self.pages.addWidget(self.catalogue_page)
+        self.crafting_page = CraftingPage()
+        self.pages.addWidget(self.crafting_page)
         self.settings_page = QWidget()
         self.settings_page.setObjectName("settingsPage")
         settings_col = QVBoxLayout(self.settings_page)
@@ -360,22 +369,27 @@ class WorkshopWindow(QMainWindow):
         self.click_sound.enabled = enabled
         self.preferences.setValue("ui/click_sound", enabled)
 
-    def _set_active_navigation(self, catalogue: bool):
-        self.catalogue_button.setProperty("active", "true" if catalogue else "false")
-        self.catalogue_button.style().unpolish(self.catalogue_button)
-        self.catalogue_button.style().polish(self.catalogue_button)
-        self.settings_button.setProperty("active", "false" if catalogue else "true")
-        self.settings_button.style().unpolish(self.settings_button)
-        self.settings_button.style().polish(self.settings_button)
+    def _set_active_navigation(self, current: str):
+        for name, button in (("catalogue", self.catalogue_button),
+                             ("crafting", self.crafting_button),
+                             ("settings", self.settings_button)):
+            button.setProperty("active", "true" if current == name else "false")
+            button.style().unpolish(button)
+            button.style().polish(button)
 
     def show_catalogue(self):
         self.pages.setCurrentWidget(self.catalogue_page)
-        self._set_active_navigation(True)
+        self._set_active_navigation("catalogue")
         self.catalogue_page.search.setFocus()
+
+    def show_crafting(self):
+        self.pages.setCurrentWidget(self.crafting_page)
+        self._set_active_navigation("crafting")
+        self.crafting_page.search.setFocus()
 
     def show_settings(self):
         self.pages.setCurrentWidget(self.settings_page)
-        self._set_active_navigation(False)
+        self._set_active_navigation("settings")
 
     def toggle_calculator(self, checked=False, *, animate=True):
         opening = not self.expanded
