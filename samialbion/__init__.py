@@ -1,3 +1,3 @@
 """Sami Albion Manager — local, personal Albion Online economy tools."""
 
-__version__ = "0.3.5"
+__version__ = "0.3.6"
