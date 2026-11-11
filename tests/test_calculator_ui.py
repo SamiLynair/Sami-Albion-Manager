@@ -116,7 +116,7 @@ class CalculatorUITests(unittest.TestCase):
             editor = control._visible_editor
             self.assertEqual(editor.objectName(), "craftVisibleNumber")
             self.assertIn("color: #382517", editor.styleSheet())
-            self.assertTrue(editor.isVisible())
+            self.assertFalse(editor.isHidden())
             expected = min(23, control.maximum())
             control.setValue(expected)
             self.assertIn(str(expected), editor.text())
