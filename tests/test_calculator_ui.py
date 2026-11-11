@@ -102,6 +102,23 @@ class CalculatorUITests(unittest.TestCase):
         self.window.catalogue_button.click()
         self.assertEqual(self.window.pages.currentWidget(), self.window.catalogue_page)
 
+    def test_crafting_numeric_inputs_have_readable_dark_text(self):
+        self.window.crafting_button.click()
+        page = self.window.crafting_page
+        controls = (page.sale_price, page.target_units, page.artisan_fee, page.return_rate)
+        page.search.setText("épée large de l'adepte")
+        page._refresh_search()
+        row = next(index for index in range(page.results.count())
+                   if page.results.item(index).data(Qt.ItemDataRole.UserRole) == "T4_MAIN_SWORD")
+        page.results.setCurrentRow(row)
+        controls += tuple(page.material_inputs.values())
+        for control in controls:
+            editor = control.lineEdit()
+            self.assertEqual(editor.objectName(), "craftNumberEditor")
+            self.assertIn("color: #422f24", editor.styleSheet())
+            control.setValue(123)
+            self.assertIn("123", control.text())
+
     def test_click_sound_can_be_disabled_in_settings(self):
         original = self.window.click_sound.enabled
         try:
