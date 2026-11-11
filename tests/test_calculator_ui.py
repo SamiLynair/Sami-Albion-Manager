@@ -119,6 +119,19 @@ class CalculatorUITests(unittest.TestCase):
             control.setValue(123)
             self.assertIn("123", control.text())
 
+    def test_selected_craft_icon_has_no_recolouring(self):
+        self.window.crafting_button.click()
+        page = self.window.crafting_page
+        self.assertGreater(page.results.count(), 0)
+        icon = page.results.item(0).icon()
+        from PySide6.QtGui import QIcon
+        normal = icon.pixmap(40, 40, QIcon.Mode.Normal).toImage()
+        selected = icon.pixmap(40, 40, QIcon.Mode.Selected).toImage()
+        self.assertEqual(normal.size(), selected.size())
+        for y in range(0, normal.height(), 3):
+            for x in range(0, normal.width(), 3):
+                self.assertEqual(normal.pixel(x, y), selected.pixel(x, y))
+
     def test_click_sound_can_be_disabled_in_settings(self):
         original = self.window.click_sound.enabled
         try:
