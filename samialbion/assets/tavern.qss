@@ -1,4 +1,4 @@
-/* Sami Albion Manager — offline artisan's catalogue, v0.4.0 */
+/* Sami Albion Manager — offline artisan's catalogue, v0.4.1 */
 QWidget#root { background: #151a17; color: #f2e6cd; }
 QWidget { font-family: "Segoe UI"; color: #eadfc8; font-size: 12px; }
 QWidget#pageBody { background: transparent; }
@@ -128,13 +128,19 @@ QMenu#marketMenu::item:disabled { color: #918775; }
 QMenu#marketMenu::separator { height: 1px; background: #6b6048; margin: 3px 6px; }
 
 /* Crafting profitability workbench. */
-QFrame#craftPanel { background: #302820; border: 1px solid #93734b; border-radius: 10px; }
-QFrame#craftPricePanel { background: #453524; border: 1px solid #947047; border-radius: 9px; }
-QFrame#craftMetric { background: #493722; border: 1px solid #947047; border-radius: 9px; }
-QLabel#craftMetricCaption { color: #d9b780; font-size: 10px; font-weight: bold; }
-QLabel#craftMetricValue { color: #f7e4bb; font-family: "Noto Serif"; font-size: 17px; font-weight: bold; }
+QFrame#craftPanel { background: qlineargradient(x1:0,y1:0,x2:1,y2:1,stop:0 #3e2e22,stop:1 #291e18); border: 1px solid #a07b4e; border-radius: 10px; }
+QFrame#craftPricePanel { background: #dfcfb9; border: 2px solid #a48460; border-radius: 9px; }
+QFrame#craftFeePanel { background: #32271e; border: 1px solid #947047; border-radius: 9px; }
+QFrame#craftMetric { background: #dfcfb9; border: 1px solid #a48460; border-radius: 9px; }
+QLabel#craftMetricCaption { color: #7d5b36; font-size: 10px; font-weight: bold; }
+QLabel#craftMetricValue { color: #4d3521; font-family: "Noto Serif"; font-size: 17px; font-weight: bold; }
 QLabel#craftField { color: #e8c999; font-size: 11px; font-weight: 600; }
+QFrame#craftPricePanel QLabel#craftField { color: #5d412b; }
 QLabel#craftResource { color: #f0e1c4; font-size: 12px; }
+QLabel#craftExplanation { color: #755b3f; font-size: 11px; }
+QLabel#craftBreakdown { background: #2d241c; color: #f0d6a8; border: 1px solid #967047; border-radius: 7px; padding: 12px; font-size: 11px; }
+QCheckBox#craftCheckbox { color: #f3e3c7; font-size: 12px; spacing: 9px; }
+QCheckBox#craftCheckbox::indicator { width: 17px; height: 17px; }
 QListWidget#craftResults { background: #e5d7c4; alternate-background-color: #d9c9b3; color: #483324; border: 2px solid #756048; border-radius: 5px; outline: 0; }
 QListWidget#craftResults::item { color: #493424; min-height: 44px; padding: 4px; border-bottom: 1px solid #c7b59d; }
 QListWidget#craftResults::item:selected { background: #e4c98f; color: #33271d; }
@@ -143,4 +149,6 @@ QComboBox#craftFilter { background: #e2d2b7; color: #422f24; border: 1px solid #
 QComboBox#craftFilter QAbstractItemView { background: #3d3529; color: #f3e4c9; selection-background-color: #81704e; }
 QSpinBox#craftNumber { background: #e8d7bd; color: #422f24; border: 1px solid #8d765a; border-radius: 8px; padding: 7px 9px; min-width: 115px; }
 QSpinBox#craftNumber:focus { background: #f6e9d0; border-color: #dfba77; }
+QDoubleSpinBox#craftNumber { background: #e8d7bd; color: #422f24; border: 1px solid #8d765a; border-radius: 8px; padding: 7px 9px; min-width: 115px; }
+QDoubleSpinBox#craftNumber:focus { background: #f6e9d0; border-color: #dfba77; }
 QScrollArea#craftScroll { border: none; background: transparent; }

@@ -1,11 +1,12 @@
-# Sami Albion Manager · V0.4.0
+# Sami Albion Manager · V0.4.1
 
 **Le Comptoir du Récolteur** est un logiciel Windows personnel pour Albion Online, intégralement utilisable hors ligne.
 
 ## Fonctions présentes
 
 - **Catalogue d'objets** : 12 503 références provenant d'un instantané du projet `ao-data/ao-bin-dumps` : équipements, ressources, matières raffinées, potions, nourriture, montures, agriculture, artefacts, mobilier et autres objets.
-- **Table de Craft (v0.4.0)** : nouvel onglet avec recherche d'objets craftables, filtrage par tier et enchantement, recettes intégrées hors ligne (8 859 recettes issues de `ao-data/ao-bin-dumps`), quantités nécessaires et images des ressources. Saisis manuellement les prix d'achat et de vente, et le nombre de fabrications pour calculer le coût, la recette, le bénéfice brut et la rentabilité. Les prix sont conservés sur ton PC. Les calculs n'incluent pas encore les frais de station, taxes et retours de ressources.
+- **Table de Craft (v0.4.0)** : nouvel onglet avec recherche d'objets craftables, filtrage par tier et enchantement, recettes intégrées hors ligne (8 859 recettes issues de `ao-data/ao-bin-dumps`), quantités nécessaires et images des ressources. Saisis manuellement les prix d'achat et de vente pour calculer la rentabilité ; les prix sont conservés sur ton PC.
+- **Table de Craft (v0.4.1)** : choisis directement le nombre **d'unités à produire** : les fabrications sont arrondies au lot supérieur et toutes les quantités d'ingrédients sont multipliées automatiquement. Option de déduction de **6,5 %** de la valeur vendue, coût d'artisan **par fabrication**, et pourcentage manuel de retour des ressources. Le panneau affiche le coût d'achat initial, la valeur des ressources récupérées, les frais et le bénéfice final estimé. Les options sont mémorisées.
 - **Recherche française/anglaise** par nom d'objet. Les identifiants techniques ne sont pas affichés.
 - **Classement comme au marché d'Albion** : menu compact en trois niveaux, par exemple **Armes → Arc → Arc de guerre**, ou **Fabrication → Ressources raffinées → Lingot**. Les catégories et sous-catégories proviennent des données de jeu `items.xml` ; les familles d'objets sont déduites localement de leurs noms. Les nouveautés sans correspondance dans ces données utilisent des catégories de remplacement.
 - **Filtres** : catégorie, tier (T1 à T8), enchantement (.0 à .4) et qualité (normale à exceptionnelle) pour les équipements où elle s'applique.

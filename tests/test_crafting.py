@@ -43,6 +43,35 @@ class CraftingTests(unittest.TestCase):
         self.assertEqual(result.profit, 0)
         self.assertIsNone(result.roi_percent)
 
+    def test_requested_units_round_up_for_multi_output_recipe(self):
+        recipe = self.recipes.by_id["T2_POTION_HEAL"]
+        result = calculate_profit(recipe, {"T2_AGARIC": 100}, 300,
+                                  target_units=31)
+        self.assertEqual(result.batches, 7)
+        self.assertEqual(result.produced, 35)
+        self.assertEqual(result.upfront_cost, 5600)
+        self.assertEqual(result.revenue, 10500)
+
+    def test_tax_craft_fee_and_resource_return_are_applied(self):
+        recipe = self.recipes.by_id["T4_MAIN_SWORD"]
+        result = calculate_profit(
+            recipe, {"T4_METALBAR": 100, "T4_LEATHER": 200}, 5000,
+            target_units=2, market_tax_enabled=True, artisan_fee_per_batch=100,
+            return_percent=20,
+        )
+        self.assertEqual(result.upfront_cost, 6400)
+        self.assertEqual(result.recovered_value, 1280)
+        self.assertEqual(result.cost, 5120)
+        self.assertEqual(result.market_fee, 650)
+        self.assertEqual(result.artisan_fee, 200)
+        self.assertEqual(result.profit, 4030)
+
+    def test_unchecked_tax_does_not_reduce_profit(self):
+        recipe = self.recipes.by_id["T4_MAIN_SWORD"]
+        result = calculate_profit(recipe, {"T4_METALBAR": 100}, 5000,
+                                  market_tax_enabled=False)
+        self.assertEqual(result.market_fee, 0)
+
 
 if __name__ == "__main__":
     unittest.main()

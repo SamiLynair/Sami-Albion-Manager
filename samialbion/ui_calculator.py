@@ -120,7 +120,7 @@ class TavernBanner(QWidget):
         painter.drawText(30, 31, "✦  CARNET D'ARTISAN  ·  ROYAUME D'ALBION")
         painter.setFont(display_font(24, bold=True, tracking=0.4))
         painter.setPen(QColor("#f9e9c8"))
-        painter.drawText(30, 97, "LE COMPTOIR DU RÉCOLTEUR")
+        painter.drawText(30, min(97, self.height() - 23), "LE COMPTOIR DU RÉCOLTEUR")
         painter.end()
 
 
@@ -378,16 +378,19 @@ class WorkshopWindow(QMainWindow):
             button.style().polish(button)
 
     def show_catalogue(self):
+        self.banner.setFixedHeight(145)
         self.pages.setCurrentWidget(self.catalogue_page)
         self._set_active_navigation("catalogue")
         self.catalogue_page.search.setFocus()
 
     def show_crafting(self):
+        self.banner.setFixedHeight(95)
         self.pages.setCurrentWidget(self.crafting_page)
         self._set_active_navigation("crafting")
         self.crafting_page.search.setFocus()
 
     def show_settings(self):
+        self.banner.setFixedHeight(145)
         self.pages.setCurrentWidget(self.settings_page)
         self._set_active_navigation("settings")
 

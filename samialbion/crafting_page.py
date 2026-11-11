@@ -5,8 +5,8 @@ from __future__ import annotations
 from PySide6.QtCore import QSettings, QSize, Qt, QTimer
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
-    QAbstractItemView, QComboBox, QFrame, QGridLayout, QHBoxLayout, QLabel,
-    QLineEdit, QListWidget, QListWidgetItem, QScrollArea, QSpinBox, QVBoxLayout,
+    QAbstractItemView, QCheckBox, QComboBox, QDoubleSpinBox, QFrame, QGridLayout,
+    QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QScrollArea, QSpinBox, QVBoxLayout,
     QWidget,
 )
 
@@ -30,6 +30,7 @@ class CraftingPage(QWidget):
         self.selected = None
         self.material_inputs: dict[str, QSpinBox] = {}
         self.material_subtotals: dict[str, QLabel] = {}
+        self.material_quantities: dict[str, QLabel] = {}
         self._build()
         self._refresh_search()
 
@@ -40,7 +41,7 @@ class CraftingPage(QWidget):
         heading = QLabel("TABLE DE CRAFT")
         heading.setObjectName("catalogueTitle")
         root.addWidget(heading)
-        subtitle = QLabel("Recettes d'Albion · Prix du marché saisis à la main · Rentabilité brute")
+        subtitle = QLabel("Recettes d'Albion · Matières premières · Frais, taxes et bénéfice net estimé")
         subtitle.setObjectName("catalogueSubtitle")
         root.addWidget(subtitle)
 
@@ -90,12 +91,12 @@ class CraftingPage(QWidget):
         details = QFrame()
         details.setObjectName("craftPanel")
         detail_col = QVBoxLayout(details)
-        detail_col.setContentsMargins(21, 17, 21, 17)
-        detail_col.setSpacing(12)
+        detail_col.setContentsMargins(17, 12, 17, 12)
+        detail_col.setSpacing(7)
         detail_col.addWidget(self._label("RECETTE ET RENTABILITÉ", "detailCaption"))
         selected_row = QHBoxLayout()
         self.item_icon = QLabel()
-        self.item_icon.setFixedSize(68, 68)
+        self.item_icon.setFixedSize(56, 56)
         selected_row.addWidget(self.item_icon)
         names = QVBoxLayout()
         self.item_name = self._label("Sélectionne un objet à gauche", "detailName")
@@ -124,26 +125,64 @@ class CraftingPage(QWidget):
         self.sale_price = self._price_input("Prix de vente")
         self.sale_price.valueChanged.connect(self._price_changed)
         sell_layout.addWidget(self.sale_price, 0, 1)
-        sell_layout.addWidget(self._label("Nombre de fabrications", "craftField"), 1, 0)
-        self.batches = QSpinBox()
-        self.batches.setObjectName("craftNumber")
-        self.batches.setRange(1, 1_000_000)
-        self.batches.setValue(1)
-        self.batches.valueChanged.connect(self._recalculate)
-        sell_layout.addWidget(self.batches, 1, 1)
+        sell_layout.addWidget(self._label("Quantité d'objets souhaitée", "craftField"), 1, 0)
+        self.target_units = QSpinBox()
+        self.target_units.setObjectName("craftNumber")
+        self.target_units.setAccessibleName("Quantité d'objets à fabriquer")
+        self.target_units.setRange(1, 1_000_000)
+        self.target_units.setValue(1)
+        self.target_units.valueChanged.connect(self._recalculate)
+        sell_layout.addWidget(self.target_units, 1, 1)
+        self.production_note = self._label("", "craftExplanation")
+        self.production_note.setWordWrap(True)
+        sell_layout.addWidget(self.production_note, 2, 0, 1, 2)
         detail_col.addWidget(sell_panel)
+
+        fees_panel = QFrame()
+        fees_panel.setObjectName("craftFeePanel")
+        fees_layout = QGridLayout(fees_panel)
+        fees_layout.setContentsMargins(15, 12, 15, 12)
+        fees_layout.setVerticalSpacing(11)
+        fees_layout.addWidget(self._label("TAXES ET BONUS", "detailCaption"), 0, 0, 1, 2)
+        self.market_tax = QCheckBox("Déduire 6,5 % sur la vente au marché")
+        self.market_tax.setObjectName("craftCheckbox")
+        self.market_tax.setChecked(self.preferences.value("craft/market_tax", False, type=bool))
+        self.market_tax.toggled.connect(self._options_changed)
+        fees_layout.addWidget(self.market_tax, 1, 0, 1, 2)
+        fees_layout.addWidget(self._label("Coût d'artisan par fabrication", "craftField"), 2, 0)
+        self.artisan_fee = self._price_input("Coût de l'artisan par fabrication")
+        self.artisan_fee.setValue(int(self.preferences.value("craft/artisan_fee", 0)))
+        self.artisan_fee.valueChanged.connect(self._options_changed)
+        fees_layout.addWidget(self.artisan_fee, 2, 1)
+        fees_layout.addWidget(self._label("Retour de ressources (%)", "craftField"), 3, 0)
+        self.return_rate = QDoubleSpinBox()
+        self.return_rate.setObjectName("craftNumber")
+        self.return_rate.setAccessibleName("Pourcentage de retour des ressources")
+        self.return_rate.setRange(0, 100)
+        self.return_rate.setDecimals(1)
+        self.return_rate.setSingleStep(1)
+        self.return_rate.setSuffix("  %")
+        self.return_rate.setValue(float(self.preferences.value("craft/return_rate", 0)))
+        self.return_rate.valueChanged.connect(self._options_changed)
+        fees_layout.addWidget(self.return_rate, 3, 1)
+        detail_col.addWidget(fees_panel)
+
+        self.breakdown = self._label("", "craftBreakdown")
+        self.breakdown.setWordWrap(True)
+        detail_col.addWidget(self.breakdown)
 
         metrics = QGridLayout()
         metrics.setHorizontalSpacing(10)
         metrics.setVerticalSpacing(9)
-        self.cost = self._metric(metrics, 0, 0, "COÛT DES RESSOURCES")
+        self.cost = self._metric(metrics, 0, 0, "COÛT NET DES RESSOURCES")
         self.revenue = self._metric(metrics, 0, 1, "VALEUR DE VENTE")
-        self.profit = self._metric(metrics, 1, 0, "BÉNÉFICE BRUT")
+        self.profit = self._metric(metrics, 1, 0, "BÉNÉFICE APRÈS FRAIS")
         self.roi = self._metric(metrics, 1, 1, "RENTABILITÉ / COÛT")
         detail_col.addLayout(metrics)
         self.disclaimer = self._label(
-            "Calcul brut : hors taxes de marché, frais de fabrication et retour des ressources. "
-            "Les prix saisis sont mémorisés sur ce PC.", "catalogueSubtitle"
+            "Simulation : retour de ressources valorisé au prix saisi ; la quantité initiale complète "
+            "reste nécessaire pour lancer le craft. Les taxes sont calculées sur la vente totale. "
+            "Les prix et options sont mémorisés sur ce PC.", "catalogueSubtitle"
         )
         self.disclaimer.setWordWrap(True)
         detail_col.addWidget(self.disclaimer)
@@ -223,7 +262,7 @@ class CraftingPage(QWidget):
         self.selected = item
         recipe = self.recipes.by_id[item.item_id]
         self.item_name.setText(item.name)
-        self.item_icon.setPixmap(self.icons.icon(item.item_id).pixmap(65, 65, QIcon.Mode.Normal))
+        self.item_icon.setPixmap(self.icons.icon(item.item_id).pixmap(54, 54, QIcon.Mode.Normal))
         output = f"{recipe.output_amount} unité(s) produite(s) par fabrication"
         if item.tier:
             output += f" · T{item.tier}.{item.enchantment}"
@@ -235,7 +274,8 @@ class CraftingPage(QWidget):
                 child.widget().deleteLater()
         self.material_inputs.clear()
         self.material_subtotals.clear()
-        for column, heading in enumerate(("Ressource", "Quantité", "Prix unitaire", "Total")):
+        self.material_quantities.clear()
+        for column, heading in enumerate(("Ressource", "À prévoir", "Prix unitaire", "Total à acheter")):
             self.materials_layout.addWidget(self._label(heading, "craftField"), 0, column)
         for index, (material_id, amount) in enumerate(recipe.materials, 1):
             resource = self.catalog.by_id.get(material_id)
@@ -251,7 +291,8 @@ class CraftingPage(QWidget):
             name_label.setWordWrap(True)
             line.addWidget(name_label, 1)
             self.materials_layout.addWidget(cell, index, 0)
-            self.materials_layout.addWidget(self._label(f"× {amount}", "craftField"), index, 1)
+            quantity_label = self._label(f"× {amount}", "craftField")
+            self.materials_layout.addWidget(quantity_label, index, 1)
             control = self._price_input(f"Prix de {name}")
             control.setValue(int(self.preferences.value(f"craft/material/{material_id}", 0)))
             control.valueChanged.connect(lambda value, key=material_id: self._material_price_changed(key, value))
@@ -260,9 +301,13 @@ class CraftingPage(QWidget):
             self.materials_layout.addWidget(subtotal, index, 3)
             self.material_inputs[material_id] = control
             self.material_subtotals[material_id] = subtotal
+            self.material_quantities[material_id] = quantity_label
         self.sale_price.blockSignals(True)
         self.sale_price.setValue(int(self.preferences.value(f"craft/sale/{item.item_id}", 0)))
         self.sale_price.blockSignals(False)
+        self.target_units.blockSignals(True)
+        self.target_units.setValue(recipe.output_amount)
+        self.target_units.blockSignals(False)
         self._recalculate()
 
     def _material_price_changed(self, key, value):
@@ -274,6 +319,12 @@ class CraftingPage(QWidget):
             self.preferences.setValue(f"craft/sale/{self.selected.item_id}", value)
         self._recalculate()
 
+    def _options_changed(self, *_):
+        self.preferences.setValue("craft/market_tax", self.market_tax.isChecked())
+        self.preferences.setValue("craft/artisan_fee", self.artisan_fee.value())
+        self.preferences.setValue("craft/return_rate", self.return_rate.value())
+        self._recalculate()
+
     def _recalculate(self, *_):
         if self.selected is None:
             for label in (self.cost, self.revenue, self.profit, self.roi):
@@ -281,22 +332,41 @@ class CraftingPage(QWidget):
             return
         recipe = self.recipes.by_id[self.selected.item_id]
         prices = {key: field.value() for key, field in self.material_inputs.items()}
+        result = calculate_profit(
+            recipe, prices, self.sale_price.value(),
+            target_units=self.target_units.value(),
+            market_tax_enabled=self.market_tax.isChecked(),
+            artisan_fee_per_batch=self.artisan_fee.value(),
+            return_percent=self.return_rate.value(),
+        )
+        self.production_note.setText(
+            f"{result.batches} fabrication(s) × {recipe.output_amount} = "
+            f"{result.produced} objet(s) produits"
+            + (" (arrondi à la fabrication supérieure)" if result.produced != self.target_units.value() else "")
+        )
         for material_id, amount in recipe.materials:
             field = self.material_inputs[material_id]
-            self.material_subtotals[material_id].setText(silver(amount * field.value() * self.batches.value()))
+            total_quantity = amount * result.batches
+            self.material_quantities[material_id].setText(f"× {total_quantity:,}".replace(",", " "))
+            self.material_subtotals[material_id].setText(silver(total_quantity * field.value()))
+        self.breakdown.setText(
+            f"Achat initial : {silver(result.upfront_cost)}  ·  "
+            f"Ressources récupérées (valeur estimée) : −{silver(result.recovered_value)}\n"
+            f"Taxe du marché : −{silver(result.market_fee)}  ·  "
+            f"Artisan : −{silver(result.artisan_fee)}"
+        )
         if not self.sale_price.value() or not all(prices.values()):
-            self.cost.setText(silver(sum(amount * prices.get(material_id, 0) for material_id, amount in recipe.materials) * self.batches.value()))
-            self.revenue.setText(silver(recipe.output_amount * self.sale_price.value() * self.batches.value()))
+            self.cost.setText(silver(result.cost))
+            self.revenue.setText(silver(result.revenue))
             self.profit.setText("Prix manquants")
             self.profit.setStyleSheet("")
             self.roi.setText("—")
             return
-        result = calculate_profit(recipe, prices, self.sale_price.value(), self.batches.value())
         self.cost.setText(silver(result.cost))
         self.revenue.setText(silver(result.revenue))
         self.profit.setText(("+" if result.profit > 0 else "") + silver(result.profit))
-        self.profit.setStyleSheet("color: #a4d99a;" if result.profit > 0 else
-                                  "color: #f0a29a;" if result.profit < 0 else "")
+        self.profit.setStyleSheet("color: #266b38;" if result.profit > 0 else
+                                  "color: #a13f33;" if result.profit < 0 else "")
         self.roi.setText(f"{result.roi_percent:+.1f} %" if result.roi_percent is not None else "—")
 
     def closeEvent(self, event):
