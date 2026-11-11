@@ -140,7 +140,9 @@ QLabel#craftResource { color: #f0e1c4; font-size: 12px; }
 QLabel#craftExplanation { color: #755b3f; font-size: 11px; }
 QLabel#craftBreakdown { background: #2d241c; color: #f0d6a8; border: 1px solid #967047; border-radius: 7px; padding: 12px; font-size: 11px; }
 QCheckBox#craftCheckbox { color: #f3e3c7; font-size: 12px; spacing: 9px; }
-QCheckBox#craftCheckbox::indicator { width: 17px; height: 17px; }
+QCheckBox#craftCheckbox::indicator { width: 17px; height: 17px; background: #e8d7bd; border: 1px solid #95724a; border-radius: 3px; }
+QCheckBox#craftCheckbox::indicator:checked { background: #d4ad69; border: 2px solid #f0ce8e; }
+QCheckBox#craftCheckbox::indicator:unchecked { background: #e8d7bd; border: 1px solid #95724a; }
 QListWidget#craftResults { background: #e5d7c4; alternate-background-color: #d9c9b3; color: #483324; border: 2px solid #756048; border-radius: 5px; outline: 0; }
 QListWidget#craftResults::item { color: #493424; min-height: 44px; padding: 4px; border-bottom: 1px solid #c7b59d; }
 QListWidget#craftResults::item:selected { background: #e4c98f; color: #33271d; }
