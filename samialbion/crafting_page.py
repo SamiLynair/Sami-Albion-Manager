@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from PySide6.QtCore import QSettings, QSize, Qt, QTimer
-from PySide6.QtGui import QColor, QIcon, QPalette
+from PySide6.QtCore import QRegularExpression, QSettings, QSize, Qt, QTimer
+from PySide6.QtGui import QIcon, QRegularExpressionValidator
 from PySide6.QtWidgets import (
     QAbstractItemView, QCheckBox, QDoubleSpinBox, QFrame, QGridLayout,
     QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QAbstractSpinBox, QScrollArea, QSpinBox, QVBoxLayout,
@@ -220,42 +220,72 @@ class CraftingPage(QWidget):
 
     @staticmethod
     def _with_step_buttons(control):
-        """Show compact, readable minus/plus buttons instead of native spin arrows."""
-        control.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
-        # QSpinBox/QDoubleSpinBox embed a QLineEdit. The global QLineEdit
-        # theme otherwise paints its text in cream against parchment fields.
-        editor = control.lineEdit()
-        editor.setObjectName("craftNumberEditor")
-        # Windows/Qt sometimes ignores a QSpinBox's foreground QSS for its
-        # internal editor. Explicitly assign BOTH palettes and a direct style.
-        # This prevents cream text on the parchment input background.
-        dark = QColor("#382517")
-        paper = QColor("#e8d7bd")
-        for widget in (control, editor):
-            palette = widget.palette()
-            palette.setColor(QPalette.ColorRole.Text, dark)
-            palette.setColor(QPalette.ColorRole.WindowText, dark)
-            palette.setColor(QPalette.ColorRole.ButtonText, dark)
-            palette.setColor(QPalette.ColorRole.Base, paper)
-            palette.setColor(QPalette.ColorGroup.Disabled, QPalette.ColorRole.Text, dark)
-            widget.setPalette(palette)
-        editor.setStyleSheet(
-            "color: #382517; background: transparent; border: 0px; "
-            "padding: 0px; selection-color: #fff5df; "
-            "selection-background-color: #8c6a42;"
-        )
-        control.setStyleSheet(
-            "QSpinBox, QDoubleSpinBox { color: #382517; background: #e8d7bd; "
-            "border: 1px solid #8d765a; border-radius: 8px; "
-            "padding: 7px 9px; min-width: 115px; } "
-            "QSpinBox:focus, QDoubleSpinBox:focus { "
-            "color: #382517; background: #f6e9d0; border-color: #dfba77; }"
-        )
+        """Independent visible editor, plus the original spin-box as the value model.
+
+        Qt's styled QSpinBox failed to paint its text in the Windows build.
+        A plain QLineEdit paints reliably, and the (hidden) spin-box still owns
+        limits, step sizes, signals, persistence and profit calculations.
+        """
         holder = QWidget()
         row = QHBoxLayout(holder)
         row.setContentsMargins(0, 0, 0, 0)
         row.setSpacing(3)
-        row.addWidget(control, 1)
+        control.setParent(holder)
+        control.hide()
+        is_decimal = isinstance(control, QDoubleSpinBox)
+
+        editor = QLineEdit(holder)
+        editor.setObjectName("craftVisibleNumber")
+        editor.setAccessibleName(control.accessibleName())
+        editor.setMinimumWidth(115)
+        editor.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        editor.setValidator(QRegularExpressionValidator(
+            QRegularExpression(r"[0-9]{0,10}(?:[.,][0-9]?)?" if is_decimal else r"[0-9]{0,10}"),
+            editor,
+        ))
+        editor.setStyleSheet(
+            "QLineEdit#craftVisibleNumber { background: #e8d7bd; "
+            "color: #382517; border: 1px solid #8d765a; "
+            "border-radius: 7px; padding: 6px 9px; "
+            "selection-color: #ffffff; selection-background-color: #8c6a42; } "
+            "QLineEdit#craftVisibleNumber:focus { background: #f6e9d0; "
+            "color: #382517; border-color: #dfba77; }"
+        )
+
+        def display(value):
+            return f"{float(value):.1f}" if is_decimal else str(int(value))
+
+        def update_display(value):
+            if not editor.hasFocus():
+                editor.setText(display(value))
+
+        def parse_input(text):
+            try:
+                numeric = float(text.replace(",", ".")) if is_decimal else int(text)
+            except (ValueError, OverflowError):
+                return
+            control.setValue(max(control.minimum(), min(control.maximum(), numeric)))
+
+        editor.setText(display(control.value()))
+        editor.textEdited.connect(parse_input)
+        editor.editingFinished.connect(lambda: editor.setText(display(control.value())))
+        control.valueChanged.connect(update_display)
+        # Keep a reference so programmatic changes with signals blocked can
+        # explicitly refresh the visible value.
+        control._visible_editor = editor
+        row.addWidget(editor, 1)
+
+        if is_decimal:
+            unit_text = "%"
+        elif control.suffix().strip():
+            unit_text = control.suffix().strip()
+        else:
+            unit_text = ""
+        if unit_text:
+            unit = QLabel(unit_text, holder)
+            unit.setObjectName("craftNumberUnit")
+            row.addWidget(unit)
+
         for symbol, direction in (("−", -1), ("+", 1)):
             button = QPushButton(symbol)
             button.setObjectName("craftStepButton")
@@ -361,9 +391,11 @@ class CraftingPage(QWidget):
         self.sale_price.blockSignals(True)
         self.sale_price.setValue(int(self.preferences.value(f"craft/sale/{item.item_id}", 0)))
         self.sale_price.blockSignals(False)
+        self.sale_price._visible_editor.setText(str(self.sale_price.value()))
         self.target_units.blockSignals(True)
         self.target_units.setValue(recipe.output_amount)
         self.target_units.blockSignals(False)
+        self.target_units._visible_editor.setText(str(self.target_units.value()))
         self._recalculate()
 
     def _material_price_changed(self, key, value):
