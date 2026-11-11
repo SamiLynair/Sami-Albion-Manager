@@ -7,6 +7,10 @@ on:
     tags:
       - "v*"
 
+concurrency:
+  group: sami-albion-windows-release
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
