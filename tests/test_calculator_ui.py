@@ -2,7 +2,6 @@
 
 import os
 import unittest
-from unittest.mock import patch
 
 from samialbion import __version__
 
@@ -61,10 +60,23 @@ class CalculatorUITests(unittest.TestCase):
         self.assertNotIn("FAN-MADE", labels)
         self.assertTrue(self.window.settings_button.isEnabled())
 
+    def test_crafting_is_home_and_first_navigation_item(self):
+        self.assertEqual(self.window.pages.currentWidget(), self.window.crafting_page)
+        self.assertEqual(self.window.crafting_button.property("active"), "true")
+        self.assertEqual(self.window.catalogue_button.property("active"), "false")
+        sidebar = self.window.crafting_button.parentWidget().layout()
+        self.assertLess(sidebar.indexOf(self.window.crafting_button),
+                        sidebar.indexOf(self.window.catalogue_button))
+        self.assertEqual(self.window.banner.height(), 95)
+        self.window.catalogue_button.click()
+        self.assertEqual(self.window.pages.currentWidget(), self.window.catalogue_page)
+        self.window.crafting_button.click()
+        self.assertEqual(self.window.pages.currentWidget(), self.window.crafting_page)
+
     def test_github_updates_button_is_available(self):
         self.assertEqual(self.window.updates_button.text(), "↻   Mises à jour")
         self.assertIsNotNone(self.window.update_controller)
-        self.assertEqual(self.window.pages.currentWidget(), self.window.catalogue_page)
+        self.assertEqual(self.window.pages.currentWidget(), self.window.crafting_page)
         self.window.settings_button.click()
         self.assertEqual(self.window.pages.currentWidget(), self.window.settings_page)
         self.assertTrue(self.window.updates_button.isVisible())
@@ -206,17 +218,20 @@ class CalculatorUITests(unittest.TestCase):
         self.assertEqual(page.artisan_fee.value(), 0)
         self.assertEqual(page.return_rate.value(), 0)
         self.assertFalse(page.market_tax.isChecked())
-        self.assertEqual(page.tax_status.text(), "DÉSACTIVÉE")
+        self.assertFalse(hasattr(page, "tax_status"))
 
-    def test_tax_checkbox_has_unambiguous_checked_status(self):
+    def test_tax_checkbox_without_redundant_status_label(self):
         self.window.crafting_button.click()
         page = self.window.crafting_page
+        self.assertFalse(hasattr(page, "tax_status"))
         page.market_tax.setChecked(False)
-        self.assertEqual(page.tax_status.text(), "DÉSACTIVÉE")
+        self.assertFalse(page.market_tax.isChecked())
         page.market_tax.setChecked(True)
-        self.assertEqual(page.tax_status.text(), "✓ ACTIVÉE")
-        self.assertTrue(page.tax_status.property("taxActive"))
+        self.assertTrue(page.market_tax.isChecked())
+        self.assertTrue(page.preferences.value("craft/market_tax", False, type=bool))
         page.market_tax.setChecked(False)
+        self.assertFalse(page.market_tax.isChecked())
+        self.assertFalse(page.preferences.value("craft/market_tax", True, type=bool))
 
     def test_market_filters_have_custom_dropdown_arrow(self):
         self.window.crafting_button.click()
@@ -239,21 +254,12 @@ class CalculatorUITests(unittest.TestCase):
             for x in range(0, normal.width(), 3):
                 self.assertEqual(normal.pixel(x, y), selected.pixel(x, y))
 
-    def test_click_sound_can_be_disabled_in_settings(self):
-        original = self.window.click_sound.enabled
-        try:
-            self.window.click_sound_checkbox.setChecked(not original)
-            self.assertEqual(self.window.click_sound.enabled, not original)
-            self.assertEqual(self.window.preferences.value("ui/click_sound", type=bool), not original)
-            self.app.installEventFilter(self.window)
-            try:
-                with patch.object(self.window.click_sound, "play") as play:
-                    QTest.mouseClick(self.window.settings_button, Qt.MouseButton.LeftButton)
-                    play.assert_called()
-            finally:
-                self.app.removeEventFilter(self.window)
-        finally:
-            self.window.click_sound_checkbox.setChecked(original)
+    def test_sound_and_its_setting_are_completely_removed(self):
+        self.assertFalse(hasattr(self.window, "click_sound"))
+        self.assertFalse(hasattr(self.window, "click_sound_checkbox"))
+        labels = [label.text() for label in self.window.findChildren(QLabel)]
+        self.assertNotIn("Sons de l'interface", labels)
+        self.assertTrue(self.window.updates_button.isEnabled())
 
     def test_clean_workshop_without_status_bar_or_descriptions(self):
         self.assertFalse(hasattr(self.window, "status"))
