@@ -26,8 +26,6 @@ QPushButton#settingsGear { background: #33271e; border: 1px solid #7f6039; borde
 QPushButton#settingsGear:hover, QPushButton#settingsGear[active="true"] { background: #6b4e2b; border-color: #dcb773; color: #fff0c8; }
 QFrame#settingsPanel { background: #222822; border: 1px solid #61543c; border-radius: 13px; }
 QLabel#settingsVersion { color: #d7c49b; font-size: 12px; }
-QCheckBox#clickSoundCheckbox { color: #e7d7b9; spacing: 9px; font-size: 12px; }
-QCheckBox#clickSoundCheckbox::indicator { width: 16px; height: 16px; }
 QLabel#selectedHint { color: #a8b99b; font-size: 10px; }
 
 QPushButton { outline: none; }
@@ -164,13 +162,6 @@ QPushButton#craftReset {
 }
 QPushButton#craftReset:hover { background: #745430; color: #fff0cd; border-color: #e0b976; }
 QPushButton#craftReset:pressed { background: #987444; color: #281b12; }
-QLabel#craftTaxStatus {
-    background: #463a2b; color: #d1bd9b; border: 1px solid #8a6d47;
-    border-radius: 5px; padding: 4px 8px; font-size: 10px; font-weight: bold;
-}
-QLabel#craftTaxStatus[taxActive="true"] {
-    background: #ebc57b; color: #302214; border: 1px solid #fff0bd;
-}
 QCheckBox#craftCheckbox::indicator:checked {
     background: #ebc57b; border: 2px solid #fff0bd;
 }
