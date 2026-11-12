@@ -187,8 +187,12 @@ class CraftingPage(QWidget):
         self.market_tax.toggled.connect(self._options_changed)
         tax_line = QHBoxLayout()
         tax_line.addWidget(self.market_tax)
+        self.tax_status = QLabel()
+        self.tax_status.setObjectName("craftTaxStatus")
+        tax_line.addWidget(self.tax_status)
         tax_line.addStretch(1)
         fees_layout.addLayout(tax_line, 1, 0, 1, 2)
+        self._update_tax_status()
         fees_layout.addWidget(self._label("Coût d'artisan par fabrication", "craftField"), 2, 0)
         self.artisan_fee = self._price_input("Coût de l'artisan par fabrication")
         self.artisan_fee.setValue(int(self.preferences.value("craft/artisan_fee", 0)))
@@ -465,6 +469,13 @@ class CraftingPage(QWidget):
         self.market_tax.setChecked(False)
         self._recalculate()
 
+    def _update_tax_status(self):
+        enabled = self.market_tax.isChecked()
+        self.tax_status.setText("✓ ACTIVÉE" if enabled else "DÉSACTIVÉE")
+        self.tax_status.setProperty("taxActive", enabled)
+        self.tax_status.style().unpolish(self.tax_status)
+        self.tax_status.style().polish(self.tax_status)
+
     def _material_price_changed(self, key, value):
         self.preferences.setValue(f"craft/material/{key}", value)
         self._recalculate()
@@ -475,6 +486,7 @@ class CraftingPage(QWidget):
         self._recalculate()
 
     def _options_changed(self, *_):
+        self._update_tax_status()
         self.preferences.setValue("craft/market_tax", self.market_tax.isChecked())
         self.preferences.setValue("craft/artisan_fee", self.artisan_fee.value())
         self.preferences.setValue("craft/return_rate", self.return_rate.value())
