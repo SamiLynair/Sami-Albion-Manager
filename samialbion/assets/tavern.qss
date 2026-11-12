@@ -330,3 +330,86 @@ QPushButton#calcNumber { background: #60432d; color: #f6e2bc; border-color: #9c7
 QPushButton#calcNumber:hover { background: #795537; }
 QPushButton#calcUtility, QPushButton#calcOperator { background: #785232; color: #ffe8c3; }
 QPushButton#calcEquals { background: #d8ae71; color: #382414; }
+
+
+/* 0.4.8 - real ledger layout: the entire workspace is now one parchment sheet.
+   This overrides the earlier isolated-card appearance. */
+QWidget#root {
+    background: qlineargradient(x1:0,y1:0,x2:1,y2:0,
+        stop:0 #1f120b,stop:0.2 #342012,stop:0.5 #29170e,
+        stop:0.8 #392315,stop:1 #24140c);
+}
+QWidget#ledgerPage {
+    background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+        stop:0 #f7e7c9,stop:0.48 #f0d9b5,stop:1 #e8cba1);
+    border: 3px solid #9b6e43;
+    border-radius: 12px;
+    color: #432b1b;
+}
+QWidget#ledgerPage QLabel { color: #52341f; font-family: "Georgia"; }
+QWidget#ledgerPage QLabel#catalogueTitle {
+    color: #452a19; font-family: "Noto Serif"; font-size: 23px; font-weight: bold;
+}
+QWidget#ledgerPage QLabel#catalogueSubtitle { color: #77563b; font-family: "Georgia"; }
+QWidget#ledgerPage QLabel#catalogueCount { color: #704321; font-weight: bold; }
+QWidget#ledgerPage QLabel#detailCaption, QWidget#ledgerPage QLabel#sectionTitle {
+    color: #613b20; font-family: "Noto Serif"; font-weight: bold;
+}
+QWidget#ledgerPage QLabel#detailName { color: #412717; font-family: "Noto Serif"; }
+QWidget#ledgerPage QLabel#detailData { color: #60432b; }
+QWidget#ledgerPage QLabel#craftField, QWidget#ledgerPage QLabel#craftMetricCaption,
+QWidget#ledgerPage QLabel#craftResource, QWidget#ledgerPage QLabel#craftExplanation,
+QWidget#ledgerPage QLabel#craftMetricValue, QWidget#ledgerPage QLabel#craftNumberUnit {
+    color: #58371e;
+}
+QWidget#ledgerPage QLabel#craftBreakdown { background: #e7cdab; color: #51331c; }
+QWidget#ledgerPage QFrame#catalogueFilters,
+QWidget#ledgerPage QFrame#craftFeePanel,
+QWidget#ledgerPage QFrame#craftPanel,
+QWidget#ledgerPage QFrame#craftPricePanel,
+QWidget#ledgerPage QFrame#craftMetric,
+QWidget#ledgerPage QFrame#itemDetail,
+QWidget#ledgerPage QFrame#settingsPanel {
+    background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+        stop:0 #f8e9ce,stop:1 #e9d0ac);
+    border: 1px solid #b5946d;
+    border-radius: 10px;
+}
+QWidget#ledgerPage QFrame#craftPanel { background: #f1ddbf; }
+QWidget#ledgerPage QFrame#itemDetail { background: #edd4af; }
+QWidget#ledgerPage QTableView#itemsTable,
+QWidget#ledgerPage QListWidget#craftResults {
+    background: #f7e7cb;
+    alternate-background-color: #ecd5b2;
+    color: #412916;
+    border: 1px solid #a47e55;
+    border-radius: 7px;
+    gridline-color: #cbb08d;
+    selection-background-color: #dfb883;
+}
+QWidget#ledgerPage QTableView#itemsTable QHeaderView::section {
+    background: #b58c5a;
+    color: #2d1b10;
+    border-bottom: 1px solid #8c643c;
+    font-family: "Noto Serif";
+}
+QWidget#ledgerPage QLineEdit#catalogueSearch,
+QWidget#ledgerPage QComboBox#catalogueFilter,
+QWidget#ledgerPage QComboBox#craftFilter,
+QWidget#ledgerPage QPushButton#marketCategoryButton {
+    background: #fff0d6; color: #3d2918;
+    border: 1px solid #a78154;
+    border-radius: 7px;
+}
+QWidget#ledgerPage QLineEdit#catalogueSearch:focus,
+QWidget#ledgerPage QComboBox#catalogueFilter:focus,
+QWidget#ledgerPage QComboBox#craftFilter:focus {
+    background: #fff8e9; border-color: #95612d;
+}
+QWidget#ledgerPage QPushButton#resetFilters,
+QWidget#ledgerPage QPushButton#craftReset {
+    background: #654023; color: #ffe9c5; border: 1px solid #a87641;
+    border-radius: 7px; font-family: "Georgia";
+}
+QWidget#ledgerPage QCheckBox#craftCheckbox,
+QWidget#ledgerPage QCheckBox#clickSoundCheckbox { color: #50331e; }
