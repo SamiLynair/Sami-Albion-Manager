@@ -120,7 +120,7 @@ class TavernBanner(QWidget):
         
         painter.setFont(display_font(24, bold=True, tracking=0.4))
         painter.setPen(QColor("#f9e9c8"))
-        painter.drawText(30, min(97, self.height() - 23), "Mon carnet d’artisan")
+        painter.drawText(30, min(97, self.height() - 23), "MON CARNET D’ARTISAN")
         painter.end()
 
 
