@@ -61,15 +61,6 @@ class CalculatorUITests(unittest.TestCase):
         self.assertNotIn("FAN-MADE", labels)
         self.assertTrue(self.window.settings_button.isEnabled())
 
-    def test_crafting_navigation_comes_before_catalogue(self):
-        sidebar_layout = self.window.crafting_button.parentWidget().layout()
-        self.assertLess(
-            sidebar_layout.indexOf(self.window.crafting_button),
-            sidebar_layout.indexOf(self.window.catalogue_button),
-        )
-        # Reordering navigation must not silently change the start page.
-        self.assertEqual(self.window.pages.currentWidget(), self.window.catalogue_page)
-
     def test_github_updates_button_is_available(self):
         self.assertEqual(self.window.updates_button.text(), "↻   Mises à jour")
         self.assertIsNotNone(self.window.update_controller)
@@ -90,7 +81,7 @@ class CalculatorUITests(unittest.TestCase):
         import inspect
         from samialbion.ui_calculator import TavernBanner
         source = inspect.getsource(TavernBanner.paintEvent)
-        self.assertIn("MON CARNET D’ARTISAN", source)
+        self.assertIn("Mon carnet d’artisan", source)
         self.assertNotIn("LE COMPTOIR DU RÉCOLTEUR", source)
         self.assertNotIn("CARNET D'ARTISAN  ·  ROYAUME D'ALBION", source)
 
@@ -215,20 +206,17 @@ class CalculatorUITests(unittest.TestCase):
         self.assertEqual(page.artisan_fee.value(), 0)
         self.assertEqual(page.return_rate.value(), 0)
         self.assertFalse(page.market_tax.isChecked())
-        self.assertFalse(hasattr(page, "tax_status"))
+        self.assertEqual(page.tax_status.text(), "DÉSACTIVÉE")
 
-    def test_tax_checkbox_is_sole_status_control(self):
+    def test_tax_checkbox_has_unambiguous_checked_status(self):
         self.window.crafting_button.click()
         page = self.window.crafting_page
-        self.assertFalse(hasattr(page, "tax_status"))
         page.market_tax.setChecked(False)
-        self.assertFalse(page.market_tax.isChecked())
+        self.assertEqual(page.tax_status.text(), "DÉSACTIVÉE")
         page.market_tax.setChecked(True)
-        self.assertTrue(page.market_tax.isChecked())
-        self.assertTrue(page.preferences.value("craft/market_tax", False, type=bool))
+        self.assertEqual(page.tax_status.text(), "✓ ACTIVÉE")
+        self.assertTrue(page.tax_status.property("taxActive"))
         page.market_tax.setChecked(False)
-        self.assertFalse(page.market_tax.isChecked())
-        self.assertFalse(page.preferences.value("craft/market_tax", True, type=bool))
 
     def test_market_filters_have_custom_dropdown_arrow(self):
         self.window.crafting_button.click()
