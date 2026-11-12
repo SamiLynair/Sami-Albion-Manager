@@ -61,6 +61,15 @@ class CalculatorUITests(unittest.TestCase):
         self.assertNotIn("FAN-MADE", labels)
         self.assertTrue(self.window.settings_button.isEnabled())
 
+    def test_crafting_navigation_comes_before_catalogue(self):
+        sidebar_layout = self.window.crafting_button.parentWidget().layout()
+        self.assertLess(
+            sidebar_layout.indexOf(self.window.crafting_button),
+            sidebar_layout.indexOf(self.window.catalogue_button),
+        )
+        # Reordering navigation must not silently change the start page.
+        self.assertEqual(self.window.pages.currentWidget(), self.window.catalogue_page)
+
     def test_github_updates_button_is_available(self):
         self.assertEqual(self.window.updates_button.text(), "↻   Mises à jour")
         self.assertIsNotNone(self.window.update_controller)
