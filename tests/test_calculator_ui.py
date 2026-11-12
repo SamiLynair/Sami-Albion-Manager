@@ -81,7 +81,7 @@ class CalculatorUITests(unittest.TestCase):
         import inspect
         from samialbion.ui_calculator import TavernBanner
         source = inspect.getsource(TavernBanner.paintEvent)
-        self.assertIn("Mon carnet d’artisan", source)
+        self.assertIn("MON CARNET D’ARTISAN", source)
         self.assertNotIn("LE COMPTOIR DU RÉCOLTEUR", source)
         self.assertNotIn("CARNET D'ARTISAN  ·  ROYAUME D'ALBION", source)
 
@@ -206,17 +206,20 @@ class CalculatorUITests(unittest.TestCase):
         self.assertEqual(page.artisan_fee.value(), 0)
         self.assertEqual(page.return_rate.value(), 0)
         self.assertFalse(page.market_tax.isChecked())
-        self.assertEqual(page.tax_status.text(), "DÉSACTIVÉE")
+        self.assertFalse(hasattr(page, "tax_status"))
 
-    def test_tax_checkbox_has_unambiguous_checked_status(self):
+    def test_tax_checkbox_is_sole_status_control(self):
         self.window.crafting_button.click()
         page = self.window.crafting_page
+        self.assertFalse(hasattr(page, "tax_status"))
         page.market_tax.setChecked(False)
-        self.assertEqual(page.tax_status.text(), "DÉSACTIVÉE")
+        self.assertFalse(page.market_tax.isChecked())
         page.market_tax.setChecked(True)
-        self.assertEqual(page.tax_status.text(), "✓ ACTIVÉE")
-        self.assertTrue(page.tax_status.property("taxActive"))
+        self.assertTrue(page.market_tax.isChecked())
+        self.assertTrue(page.preferences.value("craft/market_tax", False, type=bool))
         page.market_tax.setChecked(False)
+        self.assertFalse(page.market_tax.isChecked())
+        self.assertFalse(page.preferences.value("craft/market_tax", True, type=bool))
 
     def test_market_filters_have_custom_dropdown_arrow(self):
         self.window.crafting_button.click()
