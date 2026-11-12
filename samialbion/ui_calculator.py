@@ -119,7 +119,7 @@ class TavernBanner(QWidget):
         
         painter.setFont(display_font(24, bold=True, tracking=0.4))
         painter.setPen(QColor("#f9e9c8"))
-        painter.drawText(30, min(97, self.height() - 23), "Mon carnet d’artisan")
+        painter.drawText(30, min(97, self.height() - 23), "MON CARNET D’ARTISAN")
         painter.end()
 
 
@@ -310,7 +310,6 @@ class WorkshopWindow(QMainWindow):
         self.pages.addWidget(self.crafting_page)
         self.catalogue_page = CataloguePage()
         self.pages.addWidget(self.catalogue_page)
-        self.banner.setFixedHeight(95)
         self.settings_page = QWidget()
         self.settings_page.setObjectName("settingsPage")
         settings_col = QVBoxLayout(self.settings_page)
@@ -359,19 +358,16 @@ class WorkshopWindow(QMainWindow):
             button.style().polish(button)
 
     def show_catalogue(self):
-        self.banner.setFixedHeight(145)
         self.pages.setCurrentWidget(self.catalogue_page)
         self._set_active_navigation("catalogue")
         self.catalogue_page.search.setFocus()
 
     def show_crafting(self):
-        self.banner.setFixedHeight(95)
         self.pages.setCurrentWidget(self.crafting_page)
         self._set_active_navigation("crafting")
         self.crafting_page.search.setFocus()
 
     def show_settings(self):
-        self.banner.setFixedHeight(145)
         self.pages.setCurrentWidget(self.settings_page)
         self._set_active_navigation("settings")
 
