@@ -67,7 +67,7 @@ class CalculatorUITests(unittest.TestCase):
         sidebar = self.window.crafting_button.parentWidget().layout()
         self.assertLess(sidebar.indexOf(self.window.crafting_button),
                         sidebar.indexOf(self.window.catalogue_button))
-        self.assertEqual(self.window.banner.height(), 95)
+        self.assertEqual(self.window.banner.height(), 145)
         self.window.catalogue_button.click()
         self.assertEqual(self.window.pages.currentWidget(), self.window.catalogue_page)
         self.window.crafting_button.click()
@@ -83,6 +83,19 @@ class CalculatorUITests(unittest.TestCase):
         self.window.catalogue_button.click()
         self.assertEqual(self.window.pages.currentWidget(), self.window.catalogue_page)
 
+    def test_banner_keeps_catalogue_dimensions_on_every_page(self):
+        # All screens (including future ones) share the same banner widget.
+        expected_height = 145
+        self.assertEqual(self.window.banner.height(), expected_height)
+        self.window.catalogue_button.click()
+        self.assertEqual(self.window.banner.height(), expected_height)
+        self.window.crafting_button.click()
+        self.assertEqual(self.window.banner.height(), expected_height)
+        self.window.settings_button.click()
+        self.assertEqual(self.window.banner.height(), expected_height)
+        self.assertEqual(self.window.banner.minimumHeight(), expected_height)
+        self.assertEqual(self.window.banner.maximumHeight(), expected_height)
+
     def test_clean_window_title_and_artisan_branding(self):
         self.assertEqual(self.window.windowTitle(), f"Sami Albion Manager · {__version__}")
         labels = [label.text() for label in self.window.findChildren(QLabel)]
@@ -93,7 +106,7 @@ class CalculatorUITests(unittest.TestCase):
         import inspect
         from samialbion.ui_calculator import TavernBanner
         source = inspect.getsource(TavernBanner.paintEvent)
-        self.assertIn("Mon carnet d’artisan", source)
+        self.assertIn("MON CARNET D’ARTISAN", source)
         self.assertNotIn("LE COMPTOIR DU RÉCOLTEUR", source)
         self.assertNotIn("CARNET D'ARTISAN  ·  ROYAUME D'ALBION", source)
 
