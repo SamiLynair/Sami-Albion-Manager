@@ -259,7 +259,7 @@ class CalculatorUITests(unittest.TestCase):
         self.assertFalse(hasattr(self.window, "click_sound_checkbox"))
         labels = [label.text() for label in self.window.findChildren(QLabel)]
         self.assertNotIn("Sons de l'interface", labels)
-        self.assertTrue(self.window.updates_button.isEnabled())
+        self.assertEqual(self.window.updates_button.text(), "↻   Mises à jour")
 
     def test_clean_workshop_without_status_bar_or_descriptions(self):
         self.assertFalse(hasattr(self.window, "status"))
