@@ -191,3 +191,142 @@ QPushButton#craftStepButton:disabled { background: #453c33; color: #8c816e; bord
 /* v0.4.4: separate visible craft inputs (not Qt's embedded spinbox editor). */
 QLabel#craftNumberUnit { color: #dfc89d; background: transparent; font-size: 10px; padding: 0 3px; }
 QFrame#craftPricePanel QLabel#craftNumberUnit { color: #5d412b; }
+
+
+/* VINTAGE LEDGER THEME - visual-only redesign, no changes to game item icons.
+   Warm cream paper, walnut timber, ink typography and restrained bronze details.
+   Specific rules intentionally appear last to override the earlier dark theme. */
+QWidget { font-family: "Georgia"; font-size: 12px; color: #ead9bc; }
+QWidget#root { background: #29190f; color: #ead9bc; }
+QFrame#sideBar {
+    background: qlineargradient(x1:0,y1:0,x2:1,y2:0,
+        stop:0 #24140d,stop:0.15 #3a2316,stop:0.75 #41291b,stop:1 #25160e);
+    border-right: 2px solid #95683c;
+}
+QFrame#sideBrand { background: #4a2c1c; border: 1px solid #bc864c; border-radius: 7px; }
+QLabel#brand { font-family: "Noto Serif"; color: #f3dbad; }
+QLabel#brandSub { font-family: "Georgia"; color: #dec090; }
+QPushButton#nav, QPushButton#drawerToggle {
+    background: #422718; color: #f0d7ac; border: 1px solid #806040;
+    border-radius: 7px; text-align: left; padding: 12px 14px;
+    font-family: "Georgia"; font-size: 12px;
+}
+QPushButton#nav:hover, QPushButton#drawerToggle:hover { background: #644125; border-color: #d7a766; color: #fff1d8; }
+QPushButton#nav[active="true"] {
+    background: qlineargradient(x1:0,y1:0,x2:0,y2:1,
+        stop:0 #b78a4c,stop:0.55 #956333,stop:1 #754521);
+    color: #fff0d1; border: 1px solid #e7bd7d; font-weight: bold;
+}
+QPushButton#drawerToggle[active="false"] { background: #3c261a; color: #f0d7ac; }
+QLabel#pill { background: #4d3020; border: 1px solid #a77a49; color: #f5d5a6; }
+QLabel#footerVersion { color: #d8ae76; }
+QPushButton#settingsGear { background: #4d301f; border-color: #ae7c49; }
+
+/* Rich paper sheets with crisp ink instead of white text on dark boxes. */
+QFrame#panel, QFrame#panelWarm, QFrame#metric,
+QFrame#catalogueFilters, QFrame#itemDetail, QFrame#settingsPanel,
+QFrame#craftPanel, QFrame#craftPricePanel, QFrame#craftFeePanel,
+QFrame#craftMetric, QFrame#emptyWorkbench {
+    background: #ead6b7; border: 1px solid #a78055; border-radius: 10px;
+}
+QFrame#panelWarm, QFrame#metric, QFrame#craftMetric { background: #f0dfc4; }
+QFrame#catalogueFilters, QFrame#craftFeePanel { background: #f0dcc0; }
+QFrame#craftPanel { background: #e7cfab; }
+QFrame#craftPricePanel { background: #f1dfc3; }
+QFrame#itemDetail { background: #e9d0ac; }
+QFrame#settingsPanel { background: #ead4b2; }
+QFrame#emptyWorkbench { background: #e6d0ad; }
+QFrame#panel QLabel, QFrame#panelWarm QLabel, QFrame#metric QLabel,
+QFrame#catalogueFilters QLabel, QFrame#itemDetail QLabel,
+QFrame#settingsPanel QLabel, QFrame#craftPanel QLabel,
+QFrame#craftPricePanel QLabel, QFrame#craftFeePanel QLabel,
+QFrame#craftMetric QLabel, QFrame#emptyWorkbench QLabel { color: #4a301f; }
+QLabel#pageTitle, QLabel#catalogueTitle { font-family: "Noto Serif"; font-size: 23px; color: #f1d5a3; font-weight: bold; }
+QLabel#pageSub, QLabel#catalogueSubtitle { color: #d7b993; }
+QLabel#sectionTitle { font-family: "Noto Serif"; font-size: 16px; color: #5c381f; font-weight: bold; }
+QLabel#fieldCaption, QLabel#detailCaption, QLabel#craftField {
+    font-family: "Georgia"; color: #644326; font-size: 11px; font-weight: bold;
+}
+QLabel#detailName, QLabel#craftMetricValue, QLabel#metricValue { color: #422b1e; font-family: "Noto Serif"; }
+QLabel#detailData, QLabel#craftResource, QLabel#craftMetricCaption,
+QLabel#metricTitle, QLabel#metricHint, QLabel#smallNote, QLabel#selectedHint,
+QLabel#craftExplanation, QLabel#settingsVersion { color: #674c35; }
+QFrame#sideBar QLabel#fieldCaption { color: #e9c58e; }
+QLabel#catalogueCount { color: #eac789; }
+QCheckBox#craftCheckbox, QCheckBox#clickSoundCheckbox { color: #4a301f; font-family: "Georgia"; }
+QCheckBox#craftCheckbox::indicator, QCheckBox#clickSoundCheckbox::indicator {
+    width: 17px; height: 17px; background: #f6e7ca;
+    border: 1px solid #936c46; border-radius: 3px;
+}
+QCheckBox#craftCheckbox::indicator:checked, QCheckBox#clickSoundCheckbox::indicator:checked {
+    background: #c09353; border: 2px solid #72502e;
+}
+QPushButton#primary, QPushButton#secondary, QPushButton#quiet,
+QPushButton#craftReset, QPushButton#resetFilters {
+    background: #684225; color: #fbe9cb; border: 1px solid #bc8a52;
+    border-radius: 7px; padding: 8px 12px; font-family: "Georgia"; font-weight: bold;
+}
+QPushButton#primary:hover, QPushButton#secondary:hover, QPushButton#quiet:hover,
+QPushButton#craftReset:hover, QPushButton#resetFilters:hover {
+    background: #8a592e; border-color: #e1b77a; color: #fff5e3;
+}
+QPushButton#primary:pressed, QPushButton#secondary:pressed, QPushButton#craftReset:pressed,
+QPushButton#resetFilters:pressed { background: #53321a; }
+QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox,
+QLineEdit#catalogueSearch, QComboBox#catalogueFilter, QComboBox#craftFilter,
+QSpinBox#craftNumber, QDoubleSpinBox#craftNumber {
+    background: #faecd2; color: #39271b; selection-background-color: #c9a16a;
+    border: 1px solid #a7835d; border-radius: 7px;
+    padding: 7px 10px; min-height: 20px; font-family: "Georgia";
+}
+QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus,
+QLineEdit#catalogueSearch:focus, QComboBox#catalogueFilter:focus,
+QComboBox#craftFilter:focus { background: #fff4df; border: 1px solid #a77437; }
+QLineEdit::placeholder, QLineEdit#catalogueSearch::placeholder { color: #95795b; }
+QComboBox QAbstractItemView, QComboBox#craftFilter QAbstractItemView {
+    background: #f3e0c2; color: #422b1b; border: 1px solid #a47e52;
+    selection-background-color: #d8b481; selection-color: #392312;
+}
+QPushButton#marketCategoryButton { background: #faecd2; color: #39271b;
+    border: 1px solid #a7835d; border-radius: 7px; padding: 8px 12px; }
+QPushButton#marketCategoryButton:hover { background: #fff3dc; border-color: #a77437; }
+QMenu#marketMenu { background: #f2dec0; color: #402a1b; border: 1px solid #977048;
+    font-family: "Georgia"; }
+QMenu#marketMenu::item:selected { background: #d8b483; color: #392312; }
+QMenu#marketMenu::item:disabled { color: #a18e78; }
+QMenu#marketMenu::separator { background: #c6aa83; }
+QTableView#itemsTable, QListWidget#craftResults, QTableWidget {
+    background: #f4e2c6; alternate-background-color: #ead5b4;
+    color: #3e2a1c; gridline-color: #c8ae87;
+    border: 1px solid #997653; border-radius: 7px;
+    selection-background-color: #ddbb84; selection-color: #352316;
+}
+QTableView#itemsTable::item, QListWidget#craftResults::item, QTableWidget::item {
+    color: #3e2a1c; border-bottom: 1px solid #d0ba9b;
+}
+QTableView#itemsTable::item:selected, QListWidget#craftResults::item:selected {
+    background: #d9b27b; color: #352316;
+}
+QTableView#itemsTable QHeaderView::section, QHeaderView::section {
+    background: #cda979; color: #3e291a; font-family: "Georgia";
+    border: none; border-bottom: 1px solid #97734c; padding: 9px 6px;
+}
+QListWidget#suggestions { background: #f2dfc0; color: #402b1d; border-color: #95734d; }
+QListWidget#suggestions::item:hover { background: #e4cba7; }
+QListWidget#suggestions::item:selected { background: #d6b37e; color: #362417; }
+QScrollBar:vertical, QScrollBar:horizontal { background: #e1cbaa; }
+QScrollBar::handle:vertical, QScrollBar::handle:horizontal { background: #a58459; border-radius: 4px; }
+QScrollBar::handle:vertical:hover, QScrollBar::handle:horizontal:hover { background: #87613b; }
+QLabel#craftBreakdown { background: #ecd7b4; color: #4b321e; border: 1px solid #b08d60; }
+QLabel#craftNumberUnit, QFrame#craftPricePanel QLabel#craftNumberUnit { color: #69492c; }
+QPushButton#craftStepButton { background: #714727; color: #fce6c2; border: 1px solid #c5975c; }
+QPushButton#craftStepButton:hover { background: #976234; color: #fff1d4; border-color: #e2b87c; }
+QPushButton#craftStepButton:pressed { background: #4e2e1b; }
+QPushButton#craftStepButton:disabled { background: #bca484; color: #796451; border-color: #a99372; }
+/* Sidebar calculator intentionally remains dark for navigation consistency. */
+QFrame#calcDrawer { background: #4b3020; border-color: #b18a54; }
+QFrame#calcDisplay { background: #24180f; }
+QPushButton#calcNumber { background: #60432d; color: #f6e2bc; border-color: #9c784e; }
+QPushButton#calcNumber:hover { background: #795537; }
+QPushButton#calcUtility, QPushButton#calcOperator { background: #785232; color: #ffe8c3; }
+QPushButton#calcEquals { background: #d8ae71; color: #382414; }
