@@ -50,7 +50,7 @@ def display_font(size: int, *, bold: bool = False, tracking: float = 0) -> QFont
 class TavernBanner(QWidget):
     def __init__(self):
         super().__init__()
-        self.setFixedHeight(145)
+        self.setFixedHeight(100)
         self.banner_image = QPixmap(str(ASSETS / "header_recolte.jpg"))
 
     def _paint_harvest_image(self, painter: QPainter):
@@ -96,39 +96,24 @@ class TavernBanner(QWidget):
         painter.restore()
 
     def paintEvent(self, event):
+        """Quiet, full-width parchment heading rather than the old game-art banner."""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
-        gradient = QLinearGradient(0, 0, self.width(), self.height())
-        gradient.setColorAt(0, QColor("#3f2515"))
-        gradient.setColorAt(0.56, QColor("#51301c"))
-        gradient.setColorAt(1, QColor("#29180f"))
-        painter.setPen(QPen(QColor("#866747"), 1))
-        painter.setBrush(gradient)
-        painter.drawRoundedRect(self.rect().adjusted(1, 1, -1, -1), 16, 16)
-        painter.setPen(QPen(QColor(255, 226, 164, 17), 1))
-        for x in range(28, self.width(), 57):
-            painter.drawLine(x, 8, x + 45, self.height() - 8)
-        self._paint_harvest_image(painter)
-        painter.setPen(QPen(QColor("#866747"), 1))
-        painter.setBrush(Qt.BrushStyle.NoBrush)
-        painter.drawRoundedRect(self.rect().adjusted(1, 1, -1, -1), 16, 16)
-        # An understated parchment title plate, like the heading of a ledger.
-        plaque_width = min(610, self.width() - 55)
-        plaque = QRectF(19, 37, plaque_width, 73)
-        paper = QLinearGradient(plaque.topLeft(), plaque.bottomLeft())
-        paper.setColorAt(0, QColor("#f5e2c0"))
-        paper.setColorAt(1, QColor("#dcb98a"))
-        painter.setPen(QPen(QColor("#a67542"), 2))
+        page = QRectF(self.rect()).adjusted(2, 2, -2, -2)
+        paper = QLinearGradient(0, 0, 0, self.height())
+        paper.setColorAt(0, QColor("#fae9cb"))
+        paper.setColorAt(0.55, QColor("#f2dbb8"))
+        paper.setColorAt(1, QColor("#e8cda5"))
         painter.setBrush(paper)
-        painter.drawRoundedRect(plaque, 9, 9)
-        painter.setPen(QPen(QColor("#d2ad7a"), 1))
-        painter.setBrush(Qt.BrushStyle.NoBrush)
-        painter.drawRoundedRect(plaque.adjusted(5, 5, -5, -5), 6, 6)
-        painter.setFont(display_font(23, bold=True, tracking=0.4))
-        painter.setPen(QColor("#442b1b"))
-        painter.drawText(plaque.adjusted(20, 0, -10, 0),
-                         Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft,
+        painter.setPen(QPen(QColor("#ad855a"), 1.5))
+        painter.drawRoundedRect(page, 10, 10)
+        painter.setPen(QPen(QColor("#d4b28a"), 1))
+        painter.drawLine(25, self.height() - 15,
+                         max(26, self.width() - 25), self.height() - 15)
+        painter.setFont(display_font(24, bold=True, tracking=1.0))
+        painter.setPen(QColor("#4b2e1d"))
+        painter.drawText(page.adjusted(18, 3, -18, -3),
+                         Qt.AlignmentFlag.AlignCenter,
                          "MON CARNET D’ARTISAN")
         painter.end()
 
@@ -310,10 +295,10 @@ class WorkshopWindow(QMainWindow):
         base.addWidget(sidebar)
 
         main = QWidget()
-        main.setObjectName("root")
+        main.setObjectName("ledgerPage")
         main_col = QVBoxLayout(main)
-        main_col.setContentsMargins(25, 19, 25, 19)
-        main_col.setSpacing(17)
+        main_col.setContentsMargins(19, 16, 19, 18)
+        main_col.setSpacing(12)
         self.banner = TavernBanner()
         main_col.addWidget(self.banner)
 
