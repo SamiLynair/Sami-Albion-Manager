@@ -99,9 +99,12 @@ class WindowsSocketCapture:
         self._thread.start()
 
     def _loop(self) -> None:
+        sock = self._sock
+        if sock is None:
+            return
         while not self._stop.is_set():
             try:
-                frame = self._sock.recv(65535)
+                frame = sock.recv(65535)
             except socket.timeout:
                 continue
             except OSError:
