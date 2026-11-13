@@ -136,6 +136,25 @@ class GatheringPageTests(unittest.TestCase):
         self.assertTrue(self.page.start_button.isVisible())
         self.assertEqual(self.page.total_value.text(), "0")
 
+    def test_socket_event_is_saved_only_for_own_character(self):
+        from samialbion.photon_gathering import HarvestEvent, PlayerIdentity
+
+        self.page.source_mode.setCurrentIndex(2)
+        # The real worker is exercised by the Windows integration test.
+        self.page._socket_worker = object()
+        self.page._item_indices = {630: "T6_ORE"}
+        self.page._on_socket_identity(PlayerIdentity(1234, "TestHero"))
+        own = HarvestEvent(1234, 75, 630, 3, 1, 2, "unique-packet-id")
+        other = HarvestEvent(9999, 75, 630, 100, 0, 0, "foreign-packet-id")
+        self.page._on_socket_harvest(other)
+        self.page._on_socket_harvest(own)
+        self.page._on_socket_harvest(own)
+        self.assertEqual(self.page.total_value.text(), "6")
+        self.assertEqual(self.page.event_value.text(), "1")
+        self.assertEqual(self.page.table.item(0, 4).text(), "6")
+        self.assertEqual(self.page.session_picker.count(), 1)
+        self.page._socket_worker = None
+
     def test_start_requires_character_name(self):
         self.page.start_button.click()
         self.assertEqual(self.page.session_picker.count(), 0)
