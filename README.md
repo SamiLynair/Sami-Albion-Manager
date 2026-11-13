@@ -8,7 +8,7 @@ Cette version est un **aperçu non publié** ; `main` reste en v0.4.11.
 
 Depuis la branche `feature/gathering-session-core`, télécharger **Code → Download ZIP**, extraire entièrement l'archive, puis lancer `compiler_apercu_v0_5_windows.bat` sous Windows. Le script exécute les tests, compile puis ouvre un exécutable distinct : `dist/Sami Albion Manager 0.5 Apercu.exe`. Il ne publie aucune release et ne remplace pas la version installée.
 
-Ouvrir ensuite **Récolte**, tester une session fictive, ou sélectionner **Statistics Analysis • fichier local** pour importer en lecture seule un `Gathering.json` déjà enregistré par le logiciel tiers. **Aucune capture Socket n'est intégrée à Sami à ce stade.** Les mises à jour du tableau reflètent les sauvegardes du fichier, potentiellement différées.
+Ouvrir ensuite **Récolte**. Trois modes sont disponibles : **Démonstration**, **Statistics Analysis • fichier local** (import de `Gathering.json`), et **Socket natif • bêta** (capture directe indépendante sur Windows avec droits administrateur). Pour ce dernier mode, Sami utilise une table `IndexedItems.json` locale afin de convertir les identifiants numériques des ressources. Voir `docs/gathering-roadmap.md` pour les étapes de test et les limites actuelles.
 
 ## Fonctions présentes
 
