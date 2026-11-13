@@ -89,3 +89,27 @@ with GatheringStore(Path.home() / "SamiAlbionManager" / "gathering.db") as store
 4. Créer ensuite le tableau de bord synthétique à partir des mêmes sessions.
 
 **Ne pas fusionner ce jalon avec une fonctionnalité de capture non autorisée.**
+
+## Tester l'affichage de la v0.5.0 sur Windows
+
+Cette prévisualisation ne remplace pas la version stable v0.4.11.
+
+1. Ouvrir la branche `feature/gathering-session-core` sur GitHub et
+   télécharger **Code → Download ZIP** (pas le ZIP de `main`).
+2. Extraire **tout** le ZIP dans un nouveau dossier, distinct de l'installation.
+3. Double-cliquer sur `compiler_apercu_v0_5_windows.bat` : il installe
+   les dépendances Python dans `.venv-apercu`, lance les tests, compile
+   puis ouvre `dist/Sami Albion Manager 0.5 Apercu.exe`.
+4. Dans l'application, ouvrir « Récolte » dans le menu latéral.
+5. Tester une session fictive et le bouton « Simuler une récolte ».
+6. Optionnel : dans la liste des sources, sélectionner
+   « Statistics Analysis • fichier local ». Si SA a déjà enregistré un
+   `Gathering.json`, la page tente de le retrouver automatiquement ;
+   sinon sélectionner manuellement le fichier. Cette option ne démarre
+   pas Statistics Analysis et n'intercepte aucun paquet.
+
+Le compilateur d'aperçu **n'utilise pas `gh release create`**, ne modifie pas
+`main` et ne remplace pas l'exécutable déjà installé. Les mises à jour
+automatiques sont désactivées pendant ce test. La publication officielle
+sera préparée seulement après contrôle du rendu et des tests Windows.
+
