@@ -153,6 +153,19 @@ class _Reader:
             n = self.count()
             custom_type = self.byte()
             return [(custom_type, self.read(self.count())) for _ in range(n)]
+        if kind == 84:
+            key_kind, val_kind = self.byte(), self.byte()
+            if 20 in (key_kind, val_kind) or 64 in (key_kind, val_kind):
+                raise DecodeError("Nested typed dictionary requires further support")
+            result = []
+            for _ in range(self.count()):
+                row = {}
+                for _ in range(self.count()):
+                    key = self.value(None if key_kind == 0 else key_kind, depth=depth + 1)
+                    val = self.value(None if val_kind == 0 else val_kind, depth=depth + 1)
+                    row[key] = val
+                result.append(row)
+            return result
         if kind == 85:
             return [self.value(21, depth=depth + 1) for _ in range(self.count())]
         if kind == 19 or 128 <= kind <= 228:
