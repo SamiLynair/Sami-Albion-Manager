@@ -196,14 +196,10 @@ class GatheringPage(QWidget):
         self.table.setMinimumHeight(160)
         root.addWidget(self.table, 1)
 
-        disclaimer = QLabel(
-            "Estimation en argent indisponible : aucun prix de marché n'est "
-            "récupéré automatiquement. Les simulations restent dans une base "
-            "locale distincte de tes futures véritables sessions."
-        )
-        disclaimer.setObjectName("catalogueSubtitle")
-        disclaimer.setWordWrap(True)
-        root.addWidget(disclaimer)
+        self.disclaimer = QLabel()
+        self.disclaimer.setObjectName("catalogueSubtitle")
+        self.disclaimer.setWordWrap(True)
+        root.addWidget(self.disclaimer)
 
     @staticmethod
     def _metric(layout: QGridLayout, row: int, column: int, caption: str) -> QLabel:
@@ -238,6 +234,15 @@ class GatheringPage(QWidget):
             "STATISTICS ANALYSIS • lecture seule d'un fichier local (SA doit fonctionner séparément)"
             if sa else
             "MODE DÉMONSTRATION • événements fictifs, aucune donnée lue dans Albion Online"
+        )
+        self.disclaimer.setText(
+            "Le fichier est lu sans modification. Actualisation après sauvegarde "
+            "par Statistics Analysis, parfois après plusieurs récoltes. "
+            "Durée et ressources/heure indisponibles depuis ce fichier."
+            if sa else
+            "Estimation en argent indisponible : aucun prix de marché n'est "
+            "récupéré automatiquement. Les simulations restent dans une base "
+            "locale distincte de tes futures véritables sessions."
         )
         self.message.setText("")
         if sa:
