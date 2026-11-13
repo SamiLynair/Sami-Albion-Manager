@@ -43,6 +43,30 @@ s'appuyer sur une interface expressément autorisée.
 - Tests UI : `python -m unittest tests/test_gathering_page.py -v`
   (PySide6 et ressources embarquées nécessaires).
 
+## Lecture du fichier Statistics Analysis (optionnelle)
+
+Une solution de synchronisation **en lecture seule** existe désormais sur la page
+« Récolte ». Elle importe le fichier `Gathering.json` que Statistics Analysis
+écrit lui-même. Le fichier source n'est jamais modifié.
+
+- Dans Sami, choisir **Statistics Analysis • fichier local**.
+- Sami recherche d'abord les chemins Windows connus dans
+  `%LOCALAPPDATA%/StatisticsAnalysisTool/Instances/*/UserData-EUROPE/Gathering.json`
+  (et variantes AMERICA/ASIA). Sinon, cliquer sur **Choisir Gathering.json**.
+- Les sessions, personnages, ressources normales et bonus sont affichés.
+- Le fichier est relu automatiquement si sa date de modification change
+  (vérification toutes les 5 secondes).
+- Selon le code Statistics Analysis actuel, l'enregistrement des récoltes sur
+  disque se produit notamment après **10 événements**, pas nécessairement à
+  chaque récolte : la synchronisation ne peut donc pas être instantanée.
+- Les durées et gains/heure de ces snapshots sont affichés **indisponibles** :
+  les timestamps sauvegardés par SA ne donnent pas un début et une fin de
+  session fiables pour ce calcul.
+- Cette solution **nécessite Statistics Analysis installé et utilisé
+  séparément**. Elle ne remplace pas son moteur Socket.
+- Elle ne garantit pas que l'utilisation de Statistics Analysis soit autorisée
+  par Sandbox Interactive ; la clarification des conditions reste nécessaire.
+
 ## Contrat d'entrée (exemple sans capture)
 
 ```python
