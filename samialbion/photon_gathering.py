@@ -36,6 +36,12 @@ class HarvestEvent:
         return self.standard + self.gathering_bonus + self.premium_bonus
 
 
+@dataclass(frozen=True, slots=True)
+class PlayerIdentity:
+    user_object_id: int
+    character: str
+
+
 class _Reader:
     def __init__(self, data: bytes):
         self.data = memoryview(data)
@@ -161,8 +167,16 @@ class PhotonGatheringDecoder:
     """
 
     def decode(self, payload: bytes, *, source: str = "") -> list[HarvestEvent]:
+        """Harvest-only convenience API."""
+        return self.decode_with_identity(payload, source=source)[1]
+
+    def decode_with_identity(
+        self, payload: bytes, *, source: str = ""
+    ) -> tuple[list[PlayerIdentity], list[HarvestEvent]]:
+        """Parse own-player Join responses and HarvestFinished events."""
         if not 12 <= len(payload) <= MAX_PACKET:
-            return []
+            return [], []
+        identities: list[PlayerIdentity] = []
         harvests: list[HarvestEvent] = []
         offset = 0
         # A single UDP datagram may contain multiple Photon packets.
@@ -171,9 +185,9 @@ class PhotonGatheringDecoder:
             flags = payload[start + 2]
             count = payload[start + 3]
             if flags == 1:  # Encrypted payload
-                return harvests
+                return identities, harvests
             if count > 128:
-                return harvests
+                return identities, harvests
             peer = int.from_bytes(payload[start:start + 2], "big")
             challenge = int.from_bytes(payload[start + 8:start + 12], "big")
             offset = start + 12 + (4 if flags == 0xcc else 0)
@@ -181,14 +195,14 @@ class PhotonGatheringDecoder:
                 break
             for _ in range(count):
                 if offset + 12 > len(payload):
-                    return harvests
+                    return identities, harvests
                 command_start = offset
                 kind = payload[offset]
                 channel = payload[offset + 1]
                 command_length = int.from_bytes(payload[offset + 4:offset + 8], "big")
                 sequence = int.from_bytes(payload[offset + 8:offset + 12], "big")
                 if command_length < 12 or command_start + command_length > len(payload):
-                    return harvests
+                    return identities, harvests
                 command = payload[command_start + 12: command_start + command_length]
                 offset += command_length
                 if kind == 7:  # SendUnreliable adds four bytes
@@ -197,10 +211,21 @@ class PhotonGatheringDecoder:
                     command = command[4:]
                 elif kind != 6:
                     continue
-                if len(command) < 2 or command[1] != 4:  # Photon Event
+                if len(command) < 2 or command[1] not in (3, 4):
                     continue
                 try:
                     reader = _Reader(command[2:])
+                    if command[1] == 3:  # OperationResponse
+                        reader.byte()  # outer Photon operation code
+                        result_code = int.from_bytes(reader.read(2), "little", signed=True)
+                        reader.value()  # Debug message, nullable/string typed value
+                        params = reader.parameters()
+                        if params.get(253) == 2 and result_code == 0:
+                            uid = _nonnegative_integer(params, 0)
+                            name = params.get(2)
+                            if uid and isinstance(name, str) and name.strip():
+                                identities.append(PlayerIdentity(uid, name.strip()))
+                        continue
                     reader.byte()  # Photon event byte; Albion code is param 252
                     params = reader.parameters()
                     if params.get(252) != HARVEST_FINISHED:
@@ -223,4 +248,4 @@ class PhotonGatheringDecoder:
                     continue
             if offset <= start:
                 break
-        return harvests
+        return identities, harvests
