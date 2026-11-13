@@ -1,115 +1,85 @@
-# Module Récolte — premier jalon (branche expérimentale)
+# Sami Albion Manager v0.5.0 — Récolte et Socket natif (bêta)
 
-## Objectif
+## Architecture
 
-Suivre des sessions de récolte Albion Online sans intervenir dans le jeu.
-Le moteur est écrit en Python (bibliothèque standard) et stocke les résultats
-dans une base SQLite locale. Il n'est **pas encore relié à l'interface**.
+Trois modes indépendants sont disponibles dans la page **Récolte** :
 
-## Conformité : pas de capture du jeu
+- **Démonstration** : sessions et récoltes fictives pour tester les boutons.
+  Base locale `gathering_demo.sqlite3`.
+- **Statistics Analysis • fichier local** : lecture seule de `Gathering.json`,
+  sans lancer de capture dans Sami ; les chiffres sont actualisés après les
+  sauvegardes de Statistics Analysis.
+- **Socket natif • bêta** : collecte Windows indépendante via sockets IPv4
+  bruts (administrateur), décodage Photon / Protocol18, identification du
+  personnage par JoinResponse, détection HarvestFinished, sauvegarde SQLite
+  séparée dans `gathering_live.sqlite3`.
 
-Les conditions d'Albion Online en vigueur au 31 août 2026, §13.3, interdisent
-notamment les logiciels qui interceptent ou capturent des données en lien
-avec le jeu. Le fait qu'un autre tracker existe ou fonctionne ne vaut pas
-autorisation pour Sami Albion Manager.
+Pas d'overlay et aucune modification du processus du jeu.
 
-Référence : https://albiononline.com/terms_and_conditions
+## Source du nom des ressources
 
-**Ce jalon n'inclut aucun** sniffer de paquets, accès mémoire au client,
-injection, automatisation de gameplay, surveillance de processus, ni
-connexion à un serveur du jeu. Il n'importe que des événements explicitement
-fournis dans les tests ou par un utilisateur. Toute future source automatique
-devra faire l'objet d'une autorisation claire de Sandbox Interactive ou
-s'appuyer sur une interface expressément autorisée.
+Les événements Photon transmettent un **index numérique d'objet**. La bêta
+résout ces identifiants à l'aide de la liste `IndexedItems.json` :
+`%LOCALAPPDATA%\StatisticsAnalysisTool\Instances\<instance>\GameFiles\IndexedItems.json`.
 
-## Ce qui fonctionne
+C'est une référence locale **utilisée comme table de correspondance**.
+Statistics Analysis ne doit pas être ouvert pendant l'utilisation du mode
+Socket natif. Si le fichier n'est pas trouvé, cliquer sur le bouton
+**IndexedItems.json** dans la page Récolte et le sélectionner manuellement.
 
-- Création et fermeture de sessions par personnage.
-- Comptage détaillé : récolte normale, bonus récolteur et bonus Premium.
-- Totaux par ressource et par session, durée et ressources/heure.
-- Estimation de valeur à partir de prix *fournis*, sans requête réseau.
-- Distinction des ressources sans prix connu (pas de bénéfice fictif).
-- Déduplication par identifiant d'événement.
-- Base SQLite persistante après redémarrage.
-- Tests hors jeu : `python -m unittest tests/test_gathering_sessions.py -v`.
-- Page PySide6 « Récolte » accessible depuis le menu gauche sur cette branche :
-  création/fin de session, choix d'historique, indicateurs de quantité,
-  actions de récolte, durée et ressources/heure.
-- Affichage des noms et icônes originaux par le catalogue embarqué.
-- Simulation explicite via « + Simuler une récolte » ; aucune lecture en jeu.
-- Sessions fictives isolées dans `gathering_demo.sqlite3` sous le répertoire
-  applicatif utilisateur ; les futures données réelles devront utiliser
-  une base séparée.
-- Tests UI : `python -m unittest tests/test_gathering_page.py -v`
-  (PySide6 et ressources embarquées nécessaires).
+L'index de ressources devra ensuite être embarqué directement dans Sami
+pour supprimer cette dépendance d'installation préalable.
 
-## Lecture du fichier Statistics Analysis (optionnelle)
+## Comment tester Socket sur Windows
 
-Une solution de synchronisation **en lecture seule** existe désormais sur la page
-« Récolte ». Elle importe le fichier `Gathering.json` que Statistics Analysis
-écrit lui-même. Le fichier source n'est jamais modifié.
+1. Télécharger le ZIP de la branche `feature/gathering-session-core`.
+2. Extraire le ZIP et lancer `compiler_apercu_v0_5_windows.bat`.
+3. Le script lance les tests, compile et ouvre
+   `dist\Sami Albion Manager 0.5 Apercu.exe` sans publier de release.
+4. Pour essayer la capture, fermer l'aperçu, puis relancer **cet EXE**
+   avec **Exécuter en tant qu'administrateur**.
+5. Dans **Récolte**, choisir **Socket natif • bêta**, sélectionner l'adresse
+   IPv4 locale si nécessaire, puis cliquer **Démarrer Socket**.
+6. Se connecter à Albion après le démarrage de la capture afin que Sami puisse
+   voir la réponse Join et identifier le personnage local.
+7. Récolter quelques ressources, puis vérifier les quantités sur le tableau.
+8. Utiliser **Arrêter Socket** pour terminer et sauvegarder la session.
 
-- Dans Sami, choisir **Statistics Analysis • fichier local**.
-- Sami recherche d'abord les chemins Windows connus dans
-  `%LOCALAPPDATA%/StatisticsAnalysisTool/Instances/*/UserData-EUROPE/Gathering.json`
-  (et variantes AMERICA/ASIA). Sinon, cliquer sur **Choisir Gathering.json**.
-- Les sessions, personnages, ressources normales et bonus sont affichés.
-- Le fichier est relu automatiquement si sa date de modification change
-  (vérification toutes les 5 secondes).
-- Selon le code Statistics Analysis actuel, l'enregistrement des récoltes sur
-  disque se produit notamment après **10 événements**, pas nécessairement à
-  chaque récolte : la synchronisation ne peut donc pas être instantanée.
-- Les durées et gains/heure de ces snapshots sont affichés **indisponibles** :
-  les timestamps sauvegardés par SA ne donnent pas un début et une fin de
-  session fiables pour ce calcul.
-- Cette solution **nécessite Statistics Analysis installé et utilisé
-  séparément**. Elle ne remplace pas son moteur Socket.
-- Elle ne garantit pas que l'utilisation de Statistics Analysis soit autorisée
-  par Sandbox Interactive ; la clarification des conditions reste nécessaire.
+## Ce qui est implémenté
 
-## Contrat d'entrée (exemple sans capture)
+- Lecture Windows IPv4 / UDP avec filtrage de ports Photon.
+- Lecture des commandes Photon fiables, non fiables et fragmentées.
+- Décodeur borné Protocol18 et reconnaissance de Join + HarvestFinished.
+- Comptage normal + bonus de récolte + bonus Premium.
+- Filtre sur l'identifiant du personnage local.
+- Déduplication des retransmissions par identification de commande réseau.
+- Mise à jour du tableau PySide6 via signaux Qt.
+- Persistance locale des sessions.
+- Tests synthétiques pour les paquets, les fragments, les identifiants,
+  les numéros d'objets et la couche réseau.
 
-```python
-from pathlib import Path
-from samialbion.gathering_sessions import GatheringStore
+## Limites actuelles
 
-with GatheringStore(Path.home() / "SamiAlbionManager" / "gathering.db") as store:
-    session_id = store.start_session("PersonnageExemple")
-    store.add_event(session_id, "T6_ORE", 3, gathering_bonus=1, premium_bonus=1)
-    report = store.summary(session_id, unit_prices={"T6_ORE": 100})
-    assert report.total_resources == 5
-    store.end_session(session_id)
+- **Bêta non encore validée contre du trafic réel sur Windows.** Des cas
+  particuliers du protocole Photon et des évolutions du jeu restent possibles.
+- Mode Socket actuellement **IPv4 uniquement** ; IPv6 à intégrer ensuite.
+- Après activation du Socket, une nouvelle connexion de personnage permet de
+  détecter son identifiant ; démarrer la capture en étant déjà connecté peut
+  laisser la page en attente.
+- Les types Protocol18 peu courants ne sont pas tous implémentés.
+- Les index absents du dictionnaire sont stockés sous `INDEX_<numéro>`,
+  sans inventer de nom d'objet.
+- Les estimations économiques et les filtres avancés viendront après la
+  validation de la collecte sur une vraie session.
+
+## Vérification automatique
+
+```text
+python -m unittest discover -s tests -v
 ```
 
-## À faire
+Le workflow `.github/workflows/gathering-pr-check.yml` peut exécuter ces
+tests sur Windows. Le script d'aperçu les lance avant la compilation locale.
 
-1. Définir la source de données autorisée (validation avec Sandbox Interactive).
-2. Tester visuellement la page « Récolte » et ses commandes sur Windows.
-3. Ajouter filtres par type, tier, enchantement et session, puis valeurs marché.
-4. Créer ensuite le tableau de bord synthétique à partir des mêmes sessions.
-
-**Ne pas fusionner ce jalon avec une fonctionnalité de capture non autorisée.**
-
-## Tester l'affichage de la v0.5.0 sur Windows
-
-Cette prévisualisation ne remplace pas la version stable v0.4.11.
-
-1. Ouvrir la branche `feature/gathering-session-core` sur GitHub et
-   télécharger **Code → Download ZIP** (pas le ZIP de `main`).
-2. Extraire **tout** le ZIP dans un nouveau dossier, distinct de l'installation.
-3. Double-cliquer sur `compiler_apercu_v0_5_windows.bat` : il installe
-   les dépendances Python dans `.venv-apercu`, lance les tests, compile
-   puis ouvre `dist/Sami Albion Manager 0.5 Apercu.exe`.
-4. Dans l'application, ouvrir « Récolte » dans le menu latéral.
-5. Tester une session fictive et le bouton « Simuler une récolte ».
-6. Optionnel : dans la liste des sources, sélectionner
-   « Statistics Analysis • fichier local ». Si SA a déjà enregistré un
-   `Gathering.json`, la page tente de le retrouver automatiquement ;
-   sinon sélectionner manuellement le fichier. Cette option ne démarre
-   pas Statistics Analysis et n'intercepte aucun paquet.
-
-Le compilateur d'aperçu **n'utilise pas `gh release create`**, ne modifie pas
-`main` et ne remplace pas l'exécutable déjà installé. Les mises à jour
-automatiques sont désactivées pendant ce test. La publication officielle
-sera préparée seulement après contrôle du rendu et des tests Windows.
-
+La version publique `main` reste v0.4.11. Cette bêta v0.5.0 n'est ni
+fusionnée ni publiée comme mise à jour générale.
