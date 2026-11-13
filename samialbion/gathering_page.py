@@ -344,8 +344,17 @@ class GatheringPage(QWidget):
         if self._socket_worker is not None:
             self._socket_worker.deleteLater()
             self._socket_worker = None
+        if self._active_live_session is not None:
+            try:
+                self.live_store.end_session(self._active_live_session)
+            except (ValueError, KeyError):
+                pass
+            self._active_live_session = None
+        self._live_user_id = None
         self.socket_button.setText("Démarrer Socket")
         self.socket_interface.setEnabled(True)
+        if self._is_socket_mode() and not self._closed:
+            self._load_sessions()
 
     def _stop_socket(self):
         worker = self._socket_worker
