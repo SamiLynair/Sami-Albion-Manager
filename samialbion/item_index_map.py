@@ -45,7 +45,9 @@ def load_index_file(path: str | Path) -> dict[int, str]:
             continue
         index = entry.get("Index")
         name = entry.get("UniqueName")
-        if type(index) is int and index > 0 and isinstance(name, str) and 0 < len(name) < 151:
+        if isinstance(index, str) and index.isdecimal() and len(index) <= 10:
+            index = int(index)
+        if type(index) is int and 0 < index < 10_000_000 and isinstance(name, str) and 0 < len(name) < 151:
             mapping[index] = name
     if not mapping:
         raise ValueError("No usable indexed game items")
