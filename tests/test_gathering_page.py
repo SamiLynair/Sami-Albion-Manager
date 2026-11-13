@@ -8,7 +8,7 @@ import unittest
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 try:
-    from PySide6.QtWidgets import QApplication
+    from PySide6.QtWidgets import QApplication, QLabel
     from samialbion.gathering_page import GatheringPage
 except ImportError:
     QApplication = None
@@ -35,9 +35,9 @@ class GatheringPageTests(unittest.TestCase):
         self.assertEqual(self.page.session_picker.count(), 0)
         self.assertFalse(self.page.simulate_button.isEnabled())
         self.assertFalse(self.page.end_button.isEnabled())
-        self.assertIn("DÉMONSTRATION", self.page.findChildren(
-            type(self.page.message))[0].parentWidget().findChild(
-            type(self.page.message), "gatheringCaution").text())
+        label = self.page.findChild(QLabel, "gatheringCaution")
+        self.assertIsNotNone(label)
+        self.assertIn("DÉMONSTRATION", label.text())
 
     def test_simulation_populates_original_icon_table_and_metrics(self):
         self.page.character_input.setText("Testeur")
