@@ -1,9 +1,4 @@
-"""Gathering page with demo sessions and read-only third-party file import.
-
-There is intentionally no network, packet capture, memory reading or game
-process access. A future approved event source can feed GatheringStore without
-changing this page's accounting logic.
-"""
+"""Gathering sessions with demo, file-import and opt-in Socket beta modes."""
 
 from __future__ import annotations
 
@@ -22,6 +17,9 @@ from .gathering_sessions import GatheringStore
 from .inventory_catalog import OfflineItemCatalog
 from .item_icons import OfflineIconStore
 from .statistics_analysis_import import load_statistics_analysis_snapshot
+from .item_index_map import find_index_file, load_index_file
+from .socket_worker import PhotonSocketWorker
+from .windows_raw_capture import ipv4_addresses
 
 
 def _demo_database_path() -> Path:
@@ -61,7 +59,7 @@ def _duration(seconds: float) -> str:
 
 
 class GatheringPage(QWidget):
-    """Review demo events or Statistics Analysis JSON without game capture."""
+    """Review demo, Statistics Analysis snapshots or native Socket sessions."""
 
     DEMO_EVENTS = (
         ("T6_ORE", 3, 1, 1),
@@ -74,6 +72,12 @@ class GatheringPage(QWidget):
         super().__init__(parent)
         # Keep demo data strictly separate from future real/approved sources.
         self.store = GatheringStore(database_path or _demo_database_path())
+        live_path = Path(database_path).with_name("gathering_live.sqlite3") if database_path else _demo_database_path().with_name("gathering_live.sqlite3")
+        self.live_store = GatheringStore(live_path)
+        self._socket_worker = None
+        self._active_live_session = None
+        self._live_user_id = None
+        self._item_indices = {}
         self.catalog = OfflineItemCatalog()
         self.icons = OfflineIconStore()
         self._closed = False
@@ -114,12 +118,32 @@ class GatheringPage(QWidget):
         self.source_mode.setObjectName("gatheringSession")
         self.source_mode.addItem("Mode démonstration", "demo")
         self.source_mode.addItem("Statistics Analysis • fichier local", "sa")
+        self.source_mode.addItem("Socket natif • bêta", "socket")
         source_row.addWidget(self.source_mode, 1)
         self.sa_pick_button = QPushButton("Choisir Gathering.json")
         self.sa_pick_button.setObjectName("gatheringAction")
         self.sa_pick_button.clicked.connect(self._choose_sa_file)
         source_row.addWidget(self.sa_pick_button)
         controls_layout.addLayout(source_row)
+
+        self.socket_panel = QWidget()
+        socket_controls = QHBoxLayout(self.socket_panel)
+        socket_controls.setContentsMargins(0, 0, 0, 0)
+        self.socket_interface = QComboBox()
+        self.socket_interface.setObjectName("gatheringSession")
+        for address in ipv4_addresses():
+            self.socket_interface.addItem(address, address)
+        self.socket_interface.setToolTip("Adresse IPv4 locale de l'interface réseau à surveiller")
+        socket_controls.addWidget(self.socket_interface, 1)
+        self.socket_button = QPushButton("Démarrer Socket")
+        self.socket_button.setObjectName("gatheringAction")
+        self.socket_button.clicked.connect(self._toggle_socket)
+        socket_controls.addWidget(self.socket_button)
+        self.index_button = QPushButton("IndexedItems.json")
+        self.index_button.setObjectName("gatheringAction")
+        self.index_button.clicked.connect(self._choose_index_file)
+        socket_controls.addWidget(self.index_button)
+        controls_layout.addWidget(self.socket_panel)
 
         self.sa_file_label = QLabel("")
         self.sa_file_label.setObjectName("gatheringMessage")
@@ -162,7 +186,9 @@ class GatheringPage(QWidget):
         controls_layout.addWidget(self.message)
         root.addWidget(controls)
         saved_mode = self.preferences.value("gathering/source_mode", "demo")
-        self.source_mode.setCurrentIndex(1 if saved_mode == "sa" else 0)
+        self.source_mode.setCurrentIndex(
+            {"demo": 0, "sa": 1, "socket": 2}.get(saved_mode, 0)
+        )
         self.source_mode.currentIndexChanged.connect(self._source_changed)
 
         metrics = QGridLayout()
@@ -221,34 +247,150 @@ class GatheringPage(QWidget):
     def _is_sa_mode(self) -> bool:
         return self.source_mode.currentData() == "sa"
 
+    def _is_socket_mode(self) -> bool:
+        return self.source_mode.currentData() == "socket"
+
     def _source_changed(self, *_):
         sa = self._is_sa_mode()
-        self.preferences.setValue("gathering/source_mode", "sa" if sa else "demo")
-        self.character_input.setVisible(not sa)
-        self.start_button.setVisible(not sa)
-        self.simulate_button.setVisible(not sa)
-        self.end_button.setVisible(not sa)
+        native = self._is_socket_mode()
+        if not native and self._socket_worker is not None:
+            self._stop_socket()
+        mode = "sa" if sa else ("socket" if native else "demo")
+        self.preferences.setValue("gathering/source_mode", mode)
+        self.character_input.setVisible(mode == "demo")
+        self.start_button.setVisible(mode == "demo")
+        self.simulate_button.setVisible(mode == "demo")
+        self.end_button.setVisible(mode == "demo")
+        self.socket_panel.setVisible(native)
         self.sa_pick_button.setVisible(sa)
         self.sa_file_label.setVisible(sa)
         self.caution.setText(
-            "STATISTICS ANALYSIS • lecture seule d'un fichier local (SA doit fonctionner séparément)"
-            if sa else
-            "MODE DÉMONSTRATION • événements fictifs, aucune donnée lue dans Albion Online"
+            "MODE SOCKET BÊTA • collecte directe, sans superposition au jeu"
+            if native else
+            ("STATISTICS ANALYSIS • lecture seule d'un fichier local"
+             if sa else "MODE DÉMONSTRATION • événements fictifs")
         )
         self.disclaimer.setText(
             "Le fichier est lu sans modification. Actualisation après sauvegarde "
             "par Statistics Analysis, parfois après plusieurs récoltes. "
             "Durée et ressources/heure indisponibles depuis ce fichier."
             if sa else
-            "Estimation en argent indisponible : aucun prix de marché n'est "
-            "récupéré automatiquement. Les simulations restent dans une base "
-            "locale distincte de tes futures véritables sessions."
+            ("Socket Windows : lancer Sami en administrateur, puis se connecter "
+             "à Albion pour identifier automatiquement le personnage. "
+             "Index des objets importé depuis IndexedItems.json ; "
+             "paquets fragmentés encore ignorés par cette bêta."
+             if native else
+             "Estimation en argent indisponible : aucun prix de marché n'est "
+             "récupéré automatiquement. Les simulations restent dans une base "
+             "locale distincte de tes futures véritables sessions.")
         )
         self.message.setText("")
         if sa:
             self._reload_sa(force=True)
         else:
             self._load_sessions()
+
+    def _choose_index_file(self):
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, "Table des objets d'Albion",
+            str(find_index_file() or Path.home()), "IndexedItems.json (IndexedItems.json)"
+        )
+        if file_path:
+            self.preferences.setValue("gathering/index_file", file_path)
+            self._item_indices = {}
+            self.message.setText("Table d'objets sélectionnée. Démarre Socket.")
+
+    def _toggle_socket(self):
+        if self._socket_worker is not None:
+            self._stop_socket()
+            return
+        ip = self.socket_interface.currentData()
+        if not ip:
+            self.message.setText("Aucune adresse IPv4 trouvée. Vérifie ta connexion réseau.")
+            return
+        try:
+            idx_path = str(self.preferences.value("gathering/index_file", "") or "")
+            if not idx_path:
+                indexed_file = find_index_file()
+                idx_path = str(indexed_file) if indexed_file else ""
+            if idx_path:
+                self._item_indices = load_index_file(idx_path)
+            else:
+                self._item_indices = {}
+        except (OSError, ValueError) as error:
+            self.message.setText(f"Table des objets illisible : {error}")
+            return
+        if not self._item_indices:
+            self.message.setText("IndexedItems.json introuvable. Choisis le fichier avec le bouton prévu.")
+            return
+        self._socket_worker = PhotonSocketWorker(ip, self)
+        self._socket_worker.identity_seen.connect(self._on_socket_identity)
+        self._socket_worker.harvest_seen.connect(self._on_socket_harvest)
+        self._socket_worker.capture_error.connect(self._on_socket_error)
+        self._socket_worker.capture_ready.connect(self._on_socket_ready)
+        self._socket_worker.finished.connect(self._on_socket_finished)
+        self.socket_button.setText("Arrêter Socket")
+        self.socket_interface.setEnabled(False)
+        self.message.setText("Démarrage Socket…")
+        self._socket_worker.start()
+
+    def _on_socket_ready(self):
+        self.message.setText("Socket actif. Connecte ton personnage à Albion pour démarrer sa session.")
+
+    def _on_socket_error(self, error: str):
+        self.message.setText(f"Erreur Socket : {error}. Vérifie les droits administrateur et l'interface.")
+
+    def _on_socket_finished(self):
+        if self._socket_worker is not None:
+            self._socket_worker.deleteLater()
+            self._socket_worker = None
+        self.socket_button.setText("Démarrer Socket")
+        self.socket_interface.setEnabled(True)
+
+    def _stop_socket(self):
+        worker = self._socket_worker
+        if worker is not None:
+            worker.stop()
+            self._socket_worker = None
+            worker.deleteLater()
+        if self._active_live_session is not None:
+            self.live_store.end_session(self._active_live_session)
+            self._active_live_session = None
+        self._live_user_id = None
+        self.socket_button.setText("Démarrer Socket")
+        self.socket_interface.setEnabled(True)
+        self.message.setText("Socket arrêté. Session locale enregistrée.")
+
+    def _on_socket_identity(self, identity):
+        if self._closed or self._socket_worker is None:
+            return
+        if self._live_user_id == identity.user_object_id and self._active_live_session:
+            return
+        if self._active_live_session is not None:
+            self.live_store.end_session(self._active_live_session)
+        self._live_user_id = identity.user_object_id
+        self._active_live_session = self.live_store.start_session(identity.character)
+        self.message.setText(f"Personnage détecté : {identity.character}. Récolte en direct active.")
+        if self._is_socket_mode():
+            self._load_sessions(self._active_live_session)
+
+    def _on_socket_harvest(self, event):
+        if self._closed or self._active_live_session is None:
+            return
+        if event.user_object_id != self._live_user_id:
+            return
+        item_id = self._item_indices.get(event.item_index, f"INDEX_{event.item_index}")
+        try:
+            added = self.live_store.add_event(
+                self._active_live_session, item_id, event.standard,
+                gathering_bonus=event.gathering_bonus,
+                premium_bonus=event.premium_bonus, event_id=event.event_id,
+            )
+        except (ValueError, KeyError) as error:
+            self.message.setText(f"Événement ignoré : {error}")
+            return
+        if added and self._is_socket_mode():
+            self._load_sessions(self._active_live_session)
 
     def _choose_sa_file(self):
         filename, _ = QFileDialog.getOpenFileName(
@@ -309,7 +451,7 @@ class GatheringPage(QWidget):
 
     def _load_sessions(self, selected_id: str | None = None):
         selected_id = selected_id or self.session_picker.currentData()
-        sessions = self.store.list_sessions()
+        sessions = (self.live_store if self._is_socket_mode() else self.store).list_sessions()
         self.session_picker.blockSignals(True)
         self.session_picker.clear()
         for session_id, character, started_at, ended_at in sessions:
@@ -369,7 +511,7 @@ class GatheringPage(QWidget):
         session_id = self.session_picker.currentData()
         if session_id is None:
             return
-        summary = self.store.summary(session_id)
+        summary = (self.live_store if self._is_socket_mode() else self.store).summary(session_id)
         self.duration_value.setText(_duration(summary.duration_seconds))
         self.rate_value.setText(_number(round(summary.resources_per_hour)))
 
@@ -400,7 +542,7 @@ class GatheringPage(QWidget):
             self.simulate_button.setEnabled(False)
             return
 
-        summary = self.store.summary(session_id)
+        summary = (self.live_store if self._is_socket_mode() else self.store).summary(session_id)
         self.total_value.setText(_number(summary.total_resources))
         self.event_value.setText(_number(summary.event_count))
         self.duration_value.setText(_duration(summary.duration_seconds))
@@ -408,10 +550,11 @@ class GatheringPage(QWidget):
 
         active = summary.ended_at is None
         self.start_button.setEnabled(
+            not self._is_socket_mode() and
             not any(ended is None for _, _, _, ended in self.store.list_sessions())
         )
-        self.end_button.setEnabled(active)
-        self.simulate_button.setEnabled(active)
+        self.end_button.setEnabled(active and not self._is_socket_mode())
+        self.simulate_button.setEnabled(active and not self._is_socket_mode())
 
         self._render_resources(summary.resources)
 
@@ -438,6 +581,9 @@ class GatheringPage(QWidget):
         if not self._closed:
             self._closed = True
             self._refresh_timer.stop()
+            if self._socket_worker is not None:
+                self._stop_socket()
             self.icons.close()
+            self.live_store.close()
             self.store.close()
         super().closeEvent(event)
