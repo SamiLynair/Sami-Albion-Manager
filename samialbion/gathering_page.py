@@ -1,4 +1,4 @@
-"""Gathering page backed by local demonstration sessions only.
+"""Gathering page with demo sessions and read-only third-party file import.
 
 There is intentionally no network, packet capture, memory reading or game
 process access. A future approved event source can feed GatheringStore without
@@ -10,16 +10,17 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 
-from PySide6.QtCore import QStandardPaths, Qt, QTimer, QSize
+from PySide6.QtCore import QSettings, QStandardPaths, Qt, QTimer, QSize
 from PySide6.QtWidgets import (
     QAbstractItemView, QComboBox, QFrame, QGridLayout, QHBoxLayout,
-    QHeaderView, QLabel, QLineEdit, QPushButton, QTableWidget,
+    QHeaderView, QLabel, QLineEdit, QPushButton, QFileDialog, QTableWidget,
     QTableWidgetItem, QVBoxLayout, QWidget,
 )
 
 from .gathering_sessions import GatheringStore
 from .inventory_catalog import OfflineItemCatalog
 from .item_icons import OfflineIconStore
+from .statistics_analysis_import import load_statistics_analysis_snapshot
 
 
 def _demo_database_path() -> Path:
@@ -42,7 +43,7 @@ def _duration(seconds: float) -> str:
 
 
 class GatheringPage(QWidget):
-    """Review persisted gathering events and explicitly generate demo events."""
+    """Review demo events or Statistics Analysis JSON without game capture."""
 
     DEMO_EVENTS = (
         ("T6_ORE", 3, 1, 1),
@@ -58,8 +59,12 @@ class GatheringPage(QWidget):
         self.catalog = OfflineItemCatalog()
         self.icons = OfflineIconStore()
         self._closed = False
+        self.preferences = QSettings("Sami", "SamiAlbionManager")
+        self.sa_path = str(self.preferences.value("gathering/statistics_analysis_file", "") or "")
+        self._sa_sessions = {}
+        self._sa_file_signature = None
         self._build()
-        self._load_sessions()
+        self._source_changed()
         self._refresh_timer = QTimer(self)
         self._refresh_timer.timeout.connect(self._refresh_clock)
         self._refresh_timer.start(5000)
@@ -73,18 +78,33 @@ class GatheringPage(QWidget):
         title.setObjectName("catalogueTitle")
         root.addWidget(title)
 
-        caution = QLabel(
-            "MODE DÉMONSTRATION  •  événements fictifs, aucune donnée lue dans Albion Online"
-        )
-        caution.setObjectName("gatheringCaution")
-        caution.setWordWrap(True)
-        root.addWidget(caution)
+        self.caution = QLabel()
+        self.caution.setObjectName("gatheringCaution")
+        self.caution.setWordWrap(True)
+        root.addWidget(self.caution)
 
         controls = QFrame()
         controls.setObjectName("gatheringControls")
         controls_layout = QVBoxLayout(controls)
         controls_layout.setContentsMargins(14, 12, 14, 12)
         controls_layout.setSpacing(8)
+
+        source_row = QHBoxLayout()
+        self.source_mode = QComboBox()
+        self.source_mode.setObjectName("gatheringSession")
+        self.source_mode.addItem("Mode démonstration", "demo")
+        self.source_mode.addItem("Statistics Analysis • fichier local", "sa")
+        source_row.addWidget(self.source_mode, 1)
+        self.sa_pick_button = QPushButton("Choisir Gathering.json")
+        self.sa_pick_button.setObjectName("gatheringAction")
+        self.sa_pick_button.clicked.connect(self._choose_sa_file)
+        source_row.addWidget(self.sa_pick_button)
+        controls_layout.addLayout(source_row)
+
+        self.sa_file_label = QLabel("")
+        self.sa_file_label.setObjectName("gatheringMessage")
+        self.sa_file_label.setWordWrap(True)
+        controls_layout.addWidget(self.sa_file_label)
 
         first_row = QHBoxLayout()
         self.character_input = QLineEdit()
@@ -121,6 +141,9 @@ class GatheringPage(QWidget):
         self.message.setWordWrap(True)
         controls_layout.addWidget(self.message)
         root.addWidget(controls)
+        saved_mode = self.preferences.value("gathering/source_mode", "demo")
+        self.source_mode.setCurrentIndex(1 if saved_mode == "sa" else 0)
+        self.source_mode.currentIndexChanged.connect(self._source_changed)
 
         metrics = QGridLayout()
         metrics.setSpacing(9)
@@ -179,6 +202,86 @@ class GatheringPage(QWidget):
         layout.addWidget(panel, row, column)
         return value
 
+    def _is_sa_mode(self) -> bool:
+        return self.source_mode.currentData() == "sa"
+
+    def _source_changed(self, *_):
+        sa = self._is_sa_mode()
+        self.preferences.setValue("gathering/source_mode", "sa" if sa else "demo")
+        self.character_input.setVisible(not sa)
+        self.start_button.setVisible(not sa)
+        self.simulate_button.setVisible(not sa)
+        self.end_button.setVisible(not sa)
+        self.sa_pick_button.setVisible(sa)
+        self.sa_file_label.setVisible(sa)
+        self.caution.setText(
+            "STATISTICS ANALYSIS • lecture seule d'un fichier local (SA doit fonctionner séparément)"
+            if sa else
+            "MODE DÉMONSTRATION • événements fictifs, aucune donnée lue dans Albion Online"
+        )
+        self.message.setText("")
+        if sa:
+            self._reload_sa(force=True)
+        else:
+            self._load_sessions()
+
+    def _choose_sa_file(self):
+        filename, _ = QFileDialog.getOpenFileName(
+            self, "Fichier de récolte Statistics Analysis",
+            self.sa_path or str(Path.home()), "Gathering.json (Gathering.json)"
+        )
+        if filename:
+            self.sa_path = filename
+            self.preferences.setValue("gathering/statistics_analysis_file", filename)
+            self._sa_file_signature = None
+            self._reload_sa(force=True)
+
+    def _reload_sa(self, *, force: bool = False):
+        if not self.sa_path:
+            self.sa_file_label.setText("Sélectionne le Gathering.json créé par Statistics Analysis.")
+            self._sa_sessions = {}
+            self._load_sa_sessions()
+            return
+        path = Path(self.sa_path)
+        self.sa_file_label.setText("Source : " + str(path))
+        self.sa_file_label.setToolTip(str(path))
+        try:
+            stat = path.stat()
+            signature = (stat.st_mtime_ns, stat.st_size)
+            if not force and signature == self._sa_file_signature:
+                return
+            sessions = load_statistics_analysis_snapshot(path)
+        except (OSError, ValueError, UnicodeError, TypeError) as error:
+            self.message.setText(f"Lecture impossible : {error}")
+            return
+        except Exception as error:
+            # Includes malformed JSON while a third-party app is saving.
+            self.message.setText(f"Fichier temporairement illisible : {error}")
+            return
+
+        self._sa_file_signature = signature
+        self._sa_sessions = {
+            f"{entry.session_id}|{entry.character}": entry for entry in sessions
+        }
+        self.message.setText(
+            f"{len(sessions)} session(s) lue(s) depuis le fichier de Statistics Analysis. "
+            "Les modifications apparaissent après leur sauvegarde par SA."
+        )
+        self._load_sa_sessions()
+
+    def _load_sa_sessions(self):
+        selected = self.session_picker.currentData()
+        self.session_picker.blockSignals(True)
+        self.session_picker.clear()
+        for key, entry in self._sa_sessions.items():
+            date = entry.first_record_at.strftime("%d/%m/%Y %H:%M")
+            self.session_picker.addItem(f"{entry.character} • {date} • SA", key)
+        index = self.session_picker.findData(selected)
+        if index >= 0:
+            self.session_picker.setCurrentIndex(index)
+        self.session_picker.blockSignals(False)
+        self._show_summary()
+
     def _load_sessions(self, selected_id: str | None = None):
         selected_id = selected_id or self.session_picker.currentData()
         sessions = self.store.list_sessions()
@@ -234,7 +337,10 @@ class GatheringPage(QWidget):
         self._show_summary()
 
     def _refresh_clock(self):
-        """Update live duration without rebuilding or deselecting resource rows."""
+        """Poll the optional local file, or update demo duration."""
+        if self._is_sa_mode():
+            self._reload_sa()
+            return
         session_id = self.session_picker.currentData()
         if session_id is None:
             return
@@ -245,6 +351,20 @@ class GatheringPage(QWidget):
     def _show_summary(self, *_):
         session_id = self.session_picker.currentData()
         self.table.setRowCount(0)
+        if self._is_sa_mode():
+            self.start_button.setEnabled(False)
+            self.end_button.setEnabled(False)
+            self.simulate_button.setEnabled(False)
+            entry = self._sa_sessions.get(session_id)
+            self.total_value.setText(_number(entry.total_resources) if entry else "0")
+            self.event_value.setText(_number(entry.event_count) if entry else "0")
+            # Timestamps in SA's Gathering.json are per-resource record times;
+            # the file does not supply a reliable session start/end duration.
+            self.duration_value.setText("—")
+            self.rate_value.setText("—")
+            if entry:
+                self._render_resources(entry.resources)
+            return
         if session_id is None:
             self.total_value.setText("0")
             self.event_value.setText("0")
@@ -268,8 +388,11 @@ class GatheringPage(QWidget):
         self.end_button.setEnabled(active)
         self.simulate_button.setEnabled(active)
 
-        self.table.setRowCount(len(summary.resources))
-        for row, resource in enumerate(summary.resources):
+        self._render_resources(summary.resources)
+
+    def _render_resources(self, resources):
+        self.table.setRowCount(len(resources))
+        for row, resource in enumerate(resources):
             catalog_item = self.catalog.by_id.get(resource.item_id)
             label = catalog_item.name if catalog_item else resource.item_id
             name_cell = QTableWidgetItem(label)
