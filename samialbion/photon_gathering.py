@@ -129,12 +129,18 @@ class _Reader:
                 self.value(None if val_type == 0 else val_type, depth=depth + 1)
                 for _ in range(self.count())
             }
+        if kind == 64:
+            return [self.value(depth=depth + 1) for _ in range(self.count())]
         if kind == 67:
             return self.read(self.count())
-        if kind in (68, 73, 74, 71, 66):
+        if kind in (68, 69, 70, 73, 74, 71, 66):
             n = self.count()
             if kind == 68:
                 return [int.from_bytes(self.read(2), "little", signed=True) for _ in range(n)]
+            if kind == 69:
+                return list(struct.unpack("<" + "f" * n, self.read(n * 4)))
+            if kind == 70:
+                return list(struct.unpack("<" + "d" * n, self.read(n * 8)))
             if kind == 73:
                 return [self.zigzag(32) for _ in range(n)]
             if kind == 74:
@@ -143,6 +149,12 @@ class _Reader:
                 return [self.value(7, depth=depth + 1) for _ in range(n)]
             packed = self.read((n + 7) // 8)
             return [bool(packed[i // 8] & (1 << (i % 8))) for i in range(n)]
+        if kind == 83:
+            n = self.count()
+            custom_type = self.byte()
+            return [(custom_type, self.read(self.count())) for _ in range(n)]
+        if kind == 85:
+            return [self.value(21, depth=depth + 1) for _ in range(self.count())]
         if kind == 19 or 128 <= kind <= 228:
             subtype = self.byte() if kind == 19 else kind - 128
             return (subtype, self.read(self.count()))
