@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
+import os
 
 from PySide6.QtCore import QSettings, QStandardPaths, Qt, QTimer, QSize
 from PySide6.QtWidgets import (
@@ -29,6 +30,23 @@ def _demo_database_path() -> Path:
     )
     directory = Path(base) if base else Path.home() / ".sami_albion_manager"
     return directory / "gathering_demo.sqlite3"
+
+
+def _find_statistics_analysis_file() -> str:
+    """Locate Statistics Analysis snapshots only in its known local data tree."""
+    local = os.environ.get("LOCALAPPDATA")
+    if not local:
+        return ""
+    root = Path(local) / "StatisticsAnalysisTool"
+    try:
+        candidates = list(root.glob("Instances/*/UserData-EUROPE/Gathering.json"))
+        candidates += list(root.glob("Instances/*/UserData/Gathering.json"))
+        candidates += list(root.glob("Instances/*/UserData-AMERICA/Gathering.json"))
+        candidates += list(root.glob("Instances/*/UserData-ASIA/Gathering.json"))
+        candidates += list(root.glob("Default/UserData-EUROPE/Gathering.json"))
+        return str(max(candidates, key=lambda p: p.stat().st_mtime_ns)) if candidates else ""
+    except OSError:
+        return ""
 
 
 def _number(value: int) -> str:
@@ -61,6 +79,8 @@ class GatheringPage(QWidget):
         self._closed = False
         self.preferences = QSettings("Sami", "SamiAlbionManager")
         self.sa_path = str(self.preferences.value("gathering/statistics_analysis_file", "") or "")
+        if not self.sa_path:
+            self.sa_path = _find_statistics_analysis_file()
         self._sa_sessions = {}
         self._sa_file_signature = None
         self._build()
