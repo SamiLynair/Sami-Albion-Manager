@@ -1,4 +1,4 @@
-# Sami Albion Manager v0.5.0 — Récolte et Socket natif (bêta)
+# Sami Albion Manager v0.5.1 — Récolte et Socket natif (bêta)
 
 ## Architecture
 
@@ -35,7 +35,7 @@ pour supprimer cette dépendance d'installation préalable.
 1. Télécharger le ZIP de la branche `feature/gathering-session-core`.
 2. Extraire le ZIP et lancer `compiler_apercu_v0_5_windows.bat`.
 3. Le script lance les tests, compile et ouvre
-   `dist\Sami Albion Manager 0.5 Apercu.exe` sans publier de release.
+   `dist\Sami Albion Manager 0.5.1 Apercu.exe` sans publier de release.
 4. Pour essayer la capture, fermer l'aperçu, puis relancer **cet EXE**
    avec **Exécuter en tant qu'administrateur**.
 5. Dans **Récolte**, choisir **Socket natif • bêta**, sélectionner l'adresse
@@ -81,5 +81,5 @@ python -m unittest discover -s tests -v
 Le workflow `.github/workflows/gathering-pr-check.yml` peut exécuter ces
 tests sur Windows. Le script d'aperçu les lance avant la compilation locale.
 
-La version publique `main` reste v0.4.11. Cette bêta v0.5.0 n'est ni
+La version publique `main` reste v0.4.11. Cette bêta v0.5.1 n'est ni
 fusionnée ni publiée comme mise à jour générale.
