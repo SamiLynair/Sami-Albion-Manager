@@ -73,6 +73,19 @@ class CalculatorUITests(unittest.TestCase):
         self.window.crafting_button.click()
         self.assertEqual(self.window.pages.currentWidget(), self.window.crafting_page)
 
+    def test_gathering_page_navigation_preserves_crafting_home(self):
+        self.assertEqual(self.window.pages.currentWidget(), self.window.crafting_page)
+        side_layout = self.window.gathering_button.parentWidget().layout()
+        self.assertLess(side_layout.indexOf(self.window.catalogue_button),
+                        side_layout.indexOf(self.window.gathering_button))
+        self.window.gathering_button.click()
+        self.assertEqual(self.window.pages.currentWidget(), self.window.gathering_page)
+        self.assertEqual(self.window.gathering_button.property("active"), "true")
+        self.assertEqual(self.window.banner.height(), 145)
+        self.window.crafting_button.click()
+        self.assertEqual(self.window.pages.currentWidget(), self.window.crafting_page)
+        self.assertEqual(self.window.banner.height(), 145)
+
     def test_github_updates_button_is_available(self):
         self.assertEqual(self.window.updates_button.text(), "↻   Mises à jour")
         self.assertIsNotNone(self.window.update_controller)
