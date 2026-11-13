@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions
 cd /d "%~dp0"
-title Apercu local de la page Recolte - Sami Albion Manager v0.5.0
+title Apercu local de la page Recolte - Sami Albion Manager v0.5.1
 
 rem Ceci est un apercu separe : aucune publication GitHub.
 rem Le vrai programme deja installe n'est ni modifie ni remplace.
@@ -17,8 +17,8 @@ if not exist "app.py" (
 )
 
 for /f "delims=" %%V in ('py -3 -c "from samialbion import __version__; print(__version__)"') do set "VERSION=%%V"
-if not "%VERSION%"=="0.5.0" (
-  echo ERREUR : ce script requiert le code de la version 0.5.0 de la branche experimentale.
+if not "%VERSION%"=="0.5.1" (
+  echo ERREUR : ce script requiert le code de la version 0.5.1 de la branche experimentale.
   echo Version trouvee : %VERSION%
   goto failed
 )
@@ -39,16 +39,16 @@ if errorlevel 1 goto failed
 set "QT_QPA_PLATFORM="
 
 echo [3/4] Creation d'un EXE local distinct...
-".venv-apercu\Scripts\python.exe" -m PyInstaller --noconfirm --clean --onefile --windowed --name "Sami Albion Manager 0.5 Apercu" --icon "samialbion.ico" --add-data "samialbion.ico;." --add-data "samialbion\assets\tavern.qss;samialbion\assets" --add-data "samialbion\assets\header_recolte.jpg;samialbion\assets" --add-data "samialbion\assets\catalog.json.gz;samialbion\assets" --add-data "samialbion\assets\crafting_recipes.json.gz;samialbion\assets" --add-data "samialbion\assets\market_shop_index.json.gz;samialbion\assets" --add-data "samialbion\assets\item_icons.zip;samialbion\assets" --add-data "samialbion\assets\item_icons_manifest.json;samialbion\assets" --add-data "samialbion\assets\fonts;samialbion\assets\fonts" app.py
+".venv-apercu\Scripts\python.exe" -m PyInstaller --noconfirm --clean --onefile --windowed --name "Sami Albion Manager 0.5.1 Apercu" --icon "samialbion.ico" --add-data "samialbion.ico;." --add-data "samialbion\assets\tavern.qss;samialbion\assets" --add-data "samialbion\assets\header_recolte.jpg;samialbion\assets" --add-data "samialbion\assets\catalog.json.gz;samialbion\assets" --add-data "samialbion\assets\crafting_recipes.json.gz;samialbion\assets" --add-data "samialbion\assets\market_shop_index.json.gz;samialbion\assets" --add-data "samialbion\assets\item_icons.zip;samialbion\assets" --add-data "samialbion\assets\item_icons_manifest.json;samialbion\assets" --add-data "samialbion\assets\fonts;samialbion\assets\fonts" app.py
 if errorlevel 1 goto failed
 
 echo [4/4] Ouverture de l'apercu...
 echo.
-echo Fichier : dist\Sami Albion Manager 0.5 Apercu.exe
+echo Fichier : dist\Sami Albion Manager 0.5.1 Apercu.exe
 echo La version 0.4.11 deja installee reste intacte.
 echo Aucune publication ou mise a jour automatique ne sera effectuee.
 echo.
-start "" "%~dp0dist\Sami Albion Manager 0.5 Apercu.exe"
+start "" "%~dp0dist\Sami Albion Manager 0.5.1 Apercu.exe"
 if errorlevel 1 goto failed
 echo.
 echo Apercu lance. Ce programme peut etre relance directement depuis dist.
