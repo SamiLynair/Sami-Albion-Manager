@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import struct
+import time
 
 
 MAX_PACKET = 65535
@@ -160,11 +161,11 @@ def _nonnegative_integer(parameters: dict[int, object], index: int) -> int:
 
 
 class PhotonGatheringDecoder:
-    """Decode HarvestFinished from a Photon/Protocol18 UDP payload.
+    """Decode HarvestFinished from Photon UDP datagrams and fragments."""
 
-    Commands 6 (reliable) and 7 (unreliable) are supported. Fragmented Photon
-    commands are deliberately skipped until reassembly support is implemented.
-    """
+    def __init__(self):
+        self._fragments = {}
+
 
     def decode(self, payload: bytes, *, source: str = "") -> list[HarvestEvent]:
         """Harvest-only convenience API."""
@@ -178,6 +179,12 @@ class PhotonGatheringDecoder:
             return [], []
         identities: list[PlayerIdentity] = []
         harvests: list[HarvestEvent] = []
+        # Drop stale or excessive incomplete fragment assemblies.
+        now = time.monotonic()
+        self._fragments = {
+            key: entry for key, entry in self._fragments.items()
+            if now - entry["time"] < 15
+        }
         offset = 0
         # A single UDP datagram may contain multiple Photon packets.
         while offset + 12 <= len(payload):
@@ -209,6 +216,27 @@ class PhotonGatheringDecoder:
                     if len(command) < 4:
                         continue
                     command = command[4:]
+                elif kind == 8:
+                    complete = self._fragment(source, peer, challenge, channel, command)
+                    if complete is not None:
+                        start_sequence, reliable_payload = complete
+                        # Reuse one code path for fragmented and unfragmented
+                        # reliable commands, maintaining a stable event id.
+                        fake_header = (
+                            peer.to_bytes(2, "big") + bytes((0, 1)) +
+                            bytes(4) + challenge.to_bytes(4, "big")
+                        )
+                        fake_command = (
+                            bytes((6, channel, 0, 0)) +
+                            struct.pack(">II", 12 + len(reliable_payload), start_sequence) +
+                            reliable_payload
+                        )
+                        found_identities, found_harvests = self.decode_with_identity(
+                            fake_header + fake_command, source=source
+                        )
+                        identities.extend(found_identities)
+                        harvests.extend(found_harvests)
+                    continue
                 elif kind != 6:
                     continue
                 if len(command) < 2 or command[1] not in (3, 4):
@@ -249,3 +277,41 @@ class PhotonGatheringDecoder:
             if offset <= start:
                 break
         return identities, harvests
+
+    def _fragment(self, source: str, peer: int, challenge: int,
+                  channel: int, command: bytes) -> tuple[int, bytes] | None:
+        """Bounded, out-of-order Photon fragment reassembly."""
+        if len(command) <= 20:
+            return None
+        start, count, index, total, at = struct.unpack(">IIIII", command[:20])
+        part = command[20:]
+        if (not 1 <= count <= 8192 or index >= count or
+                not 1 <= total <= 4 * 1024 * 1024 or
+                not part or at >= total or len(part) > total - at):
+            return None
+        key = (source, peer, challenge, channel, start)
+        if len(self._fragments) >= 64 and key not in self._fragments:
+            oldest = min(self._fragments, key=lambda k: self._fragments[k]["time"])
+            del self._fragments[oldest]
+        record = self._fragments.get(key)
+        if record is None or record["count"] != count or record["total"] != total:
+            record = {
+                "count": count, "total": total, "time": time.monotonic(), "parts": {}
+            }
+            self._fragments[key] = record
+        old = record["parts"].get(index)
+        if old is not None and old != (at, part):
+            del self._fragments[key]
+            return None
+        record["parts"][index] = (at, part)
+        record["time"] = time.monotonic()
+        if len(record["parts"]) != count:
+            return None
+        result = bytearray()
+        for at, chunk in sorted(record["parts"].values()):
+            if at != len(result):
+                del self._fragments[key]
+                return None
+            result.extend(chunk)
+        del self._fragments[key]
+        return (start, bytes(result)) if len(result) == total else None
