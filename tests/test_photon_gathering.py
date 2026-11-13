@@ -67,6 +67,30 @@ class PhotonGatheringTests(unittest.TestCase):
         changed = self.decoder.decode(event_frame(sequence=43))[0]
         self.assertNotEqual(first.event_id, changed.event_id)
 
+    def test_out_of_order_and_duplicate_fragments_are_reassembled_once(self):
+        original = event_frame()
+        reliable_body = original[24:]
+        parts = (reliable_body[:11], reliable_body[11:])
+        packets = []
+        for idx, part in enumerate(parts):
+            frag_header = struct.pack(">IIIII",
+                                      1000, len(parts), idx, len(reliable_body),
+                                      0 if idx == 0 else len(parts[0]))
+            command_body = frag_header + part
+            command = (
+                bytes([8, 2, 0, 0]) +
+                struct.pack(">II", 12 + len(command_body), idx + 1) +
+                command_body
+            )
+            packets.append(struct.pack(">HBBII", 0xF101, 0, 1, 100, 200) + command)
+
+        self.assertEqual(self.decoder.decode(packets[1], source="node"), [])
+        self.assertEqual(self.decoder.decode(packets[1], source="node"), [])
+        results = self.decoder.decode(packets[0], source="node")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].total, 6)
+        self.assertEqual(results[0].event_id, "node|61697|200|2|1000")
+
     def test_truncation_and_unrecognized_types_are_safe(self):
         full = event_frame()
         self.assertEqual(self.decoder.decode(full[:21]), [])
