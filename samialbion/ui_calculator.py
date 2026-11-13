@@ -19,6 +19,7 @@ from . import __version__
 from .calculator import Calculator
 from .catalogue_page import CataloguePage
 from .crafting_page import CraftingPage
+from .gathering_page import GatheringPage
 from .update_ui import UpdateController
 
 
@@ -247,6 +248,12 @@ class WorkshopWindow(QMainWindow):
         self.catalogue_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.catalogue_button.clicked.connect(self.show_catalogue)
         side_col.addWidget(self.catalogue_button)
+        self.gathering_button = QPushButton("⛏   Récolte")
+        self.gathering_button.setObjectName("nav")
+        self.gathering_button.setProperty("active", "false")
+        self.gathering_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.gathering_button.clicked.connect(self.show_gathering)
+        side_col.addWidget(self.gathering_button)
         side_col.addStretch(1)
 
         self.drawer_button = QPushButton("▾  🧮  Calculatrice")
@@ -310,6 +317,8 @@ class WorkshopWindow(QMainWindow):
         self.pages.addWidget(self.crafting_page)
         self.catalogue_page = CataloguePage()
         self.pages.addWidget(self.catalogue_page)
+        self.gathering_page = GatheringPage()
+        self.pages.addWidget(self.gathering_page)
         self.settings_page = QWidget()
         self.settings_page.setObjectName("settingsPage")
         settings_col = QVBoxLayout(self.settings_page)
@@ -352,6 +361,7 @@ class WorkshopWindow(QMainWindow):
     def _set_active_navigation(self, current: str):
         for name, button in (("catalogue", self.catalogue_button),
                              ("crafting", self.crafting_button),
+                             ("gathering", self.gathering_button),
                              ("settings", self.settings_button)):
             button.setProperty("active", "true" if current == name else "false")
             button.style().unpolish(button)
@@ -366,6 +376,10 @@ class WorkshopWindow(QMainWindow):
         self.pages.setCurrentWidget(self.crafting_page)
         self._set_active_navigation("crafting")
         self.crafting_page.search.setFocus()
+
+    def show_gathering(self):
+        self.pages.setCurrentWidget(self.gathering_page)
+        self._set_active_navigation("gathering")
 
     def show_settings(self):
         self.pages.setCurrentWidget(self.settings_page)
@@ -400,6 +414,7 @@ class WorkshopWindow(QMainWindow):
         if not self.update_controller.stop_workers():
             event.ignore()
             return
+        self.gathering_page.close()
         super().closeEvent(event)
 
     def eventFilter(self, watched, event):

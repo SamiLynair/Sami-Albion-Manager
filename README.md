@@ -1,6 +1,14 @@
-# Sami Albion Manager · V0.4.1
+# Sami Albion Manager · v0.5.1 (aperçu expérimental)
 
-**Le Comptoir du Récolteur** est un logiciel Windows personnel pour Albion Online, intégralement utilisable hors ligne.
+**Mon carnet d'artisan** est un logiciel Windows personnel pour Albion Online : catalogue, craft et, dans cette branche expérimentale, suivi local des récoltes.
+
+## Essayer la page Récolte de la v0.5.1
+
+Cette version est un **aperçu non publié** ; `main` reste en v0.4.11.
+
+Depuis la branche `feature/gathering-session-core`, télécharger **Code → Download ZIP**, extraire entièrement l'archive, puis lancer `compiler_apercu_v0_5_windows.bat` sous Windows. Le script exécute les tests, compile puis ouvre un exécutable distinct : `dist/Sami Albion Manager 0.5.1 Apercu.exe`. Il ne publie aucune release et ne remplace pas la version installée.
+
+Ouvrir ensuite **Récolte**. Trois modes sont disponibles : **Démonstration**, **Statistics Analysis • fichier local** (import de `Gathering.json`), et **Socket natif • bêta** (capture directe indépendante sur Windows avec droits administrateur). Pour ce dernier mode, Sami utilise une table `IndexedItems.json` locale afin de convertir les identifiants numériques des ressources. Voir `docs/gathering-roadmap.md` pour les étapes de test et les limites actuelles.
 
 ## Fonctions présentes
 
@@ -19,7 +27,6 @@
 - **Images des objets** : **11 803 illustrations** issues du service de rendu du jeu, récupérées une seule fois pendant le développement et enregistrées localement au format WEBP dans `samialbion/assets/item_icons.zip`. Les variantes de qualité réutilisent l'illustration de base et affichent un cadre coloré et le niveau choisi. Les 700 identifiants sans rendu disponible gardent un pictogramme « ? », jamais une fausse image.
 - **Calculatrice** fermée au démarrage : elle se déploie uniquement en cliquant sur son volet en bas de la barre latérale. Opérations courantes et utilisation au clavier.
 - **Paramètres** : roue crantée près de « Made by Sami », ouvrant une page dédiée qui héberge désormais le bouton « Mises à jour ». Vérification discrète au démarrage, téléchargement, contrôle SHA-256, remplacement et redémarrage lors d'une nouvelle version GitHub. Confirmation obligatoire avant le téléchargement.
-- **Clics d'interface** : un son très court et discret accompagne les clics de souris. Il se désactive et se réactive dans Paramètres → Sons de l'interface ; le choix est mémorisé sur Windows.
 - **Catalogue épuré** : les entrées techniques sans nom d'objet sont masquées, tout comme les identifiants dans les infobulles et les fiches. La mention de bas de fiche a été supprimée.
 - **Signature** « Made by Sami », numéro de version en bleu et bandeau illustré du jeu.
 

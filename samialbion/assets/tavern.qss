@@ -182,3 +182,40 @@ QPushButton#craftStepButton:disabled { background: #453c33; color: #8c816e; bord
 /* v0.4.4: separate visible craft inputs (not Qt's embedded spinbox editor). */
 QLabel#craftNumberUnit { color: #dfc89d; background: transparent; font-size: 10px; padding: 0 3px; }
 QFrame#craftPricePanel QLabel#craftNumberUnit { color: #5d412b; }
+
+/* Gathering demonstration page, matching the existing workshop palette. */
+QFrame#gatheringControls {
+    background: #32271e;
+    border: 1px solid #947047;
+    border-radius: 9px;
+}
+QLabel#gatheringCaution {
+    color: #e6c38c; font-size: 11px;
+    font-weight: 700; padding: 4px 2px;
+}
+QLabel#gatheringMessage { color: #e6cb9f; font-size: 11px; }
+QLineEdit#gatheringCharacter, QComboBox#gatheringSession {
+    background: #e9dac1; color: #3f2b1c;
+    border: 1px solid #a98962; border-radius: 7px; padding: 7px 10px;
+}
+QPushButton#gatheringAction {
+    background: #5b3d25; color: #f1d5a5; border: 1px solid #ab824b;
+    border-radius: 7px; font-weight: 600; padding: 9px 12px;
+}
+QPushButton#gatheringAction:hover { background: #76502d; border-color: #e2b778; }
+QPushButton#gatheringAction:disabled {
+    background: #343029; color: #827967; border-color: #595043;
+}
+QTableWidget#gatheringTable {
+    background: #e5d7c4;
+    alternate-background-color: #d9c9b3; color: #483324;
+    border: 2px solid #756048; border-radius: 6px;
+    gridline-color: #c9b697;
+    selection-background-color: #e4c98f; selection-color: #33271d;
+}
+QTableWidget#gatheringTable::item { color: #483324; padding: 5px 9px; }
+QTableWidget#gatheringTable QHeaderView::section {
+    background: #d3c0a5; color: #63442e;
+    border: none; border-bottom: 2px solid #aa8e67;
+    font-family: "Noto Serif"; font-weight: bold; padding: 8px;
+}
