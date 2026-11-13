@@ -61,7 +61,7 @@ class GatheringPage(QWidget):
         self._build()
         self._load_sessions()
         self._refresh_timer = QTimer(self)
-        self._refresh_timer.timeout.connect(self._show_summary)
+        self._refresh_timer.timeout.connect(self._refresh_clock)
         self._refresh_timer.start(5000)
 
     def _build(self):
@@ -232,6 +232,15 @@ class GatheringPage(QWidget):
             f"{name.name if name else item_id}."
         )
         self._show_summary()
+
+    def _refresh_clock(self):
+        """Update live duration without rebuilding or deselecting resource rows."""
+        session_id = self.session_picker.currentData()
+        if session_id is None:
+            return
+        summary = self.store.summary(session_id)
+        self.duration_value.setText(_duration(summary.duration_seconds))
+        self.rate_value.setText(_number(round(summary.resources_per_hour)))
 
     def _show_summary(self, *_):
         session_id = self.session_picker.currentData()
