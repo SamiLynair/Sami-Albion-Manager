@@ -87,6 +87,17 @@ class GatheringPageTests(unittest.TestCase):
         self.assertEqual(self.page.session_picker.count(), 1)
         self.assertFalse(self.page.simulate_button.isEnabled())
 
+    def test_windows_statistics_analysis_file_is_auto_detected(self):
+        from unittest.mock import patch
+        from samialbion.gathering_page import _find_statistics_analysis_file
+
+        root = Path(self.folder.name) / "StatisticsAnalysisTool" / "Instances" / "instance-1" / "UserData-EUROPE"
+        root.mkdir(parents=True)
+        source = root / "Gathering.json"
+        source.write_text("[]", encoding="utf-8")
+        with patch.dict(os.environ, {"LOCALAPPDATA": self.folder.name}):
+            self.assertEqual(Path(_find_statistics_analysis_file()), source)
+
     def test_read_only_statistics_analysis_snapshot_and_refresh(self):
         import json
         from datetime import datetime, timezone
