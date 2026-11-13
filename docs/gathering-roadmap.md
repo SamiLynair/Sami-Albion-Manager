@@ -32,6 +32,16 @@ s'appuyer sur une interface expressément autorisée.
 - Déduplication par identifiant d'événement.
 - Base SQLite persistante après redémarrage.
 - Tests hors jeu : `python -m unittest tests/test_gathering_sessions.py -v`.
+- Page PySide6 « Récolte » accessible depuis le menu gauche sur cette branche :
+  création/fin de session, choix d'historique, indicateurs de quantité,
+  actions de récolte, durée et ressources/heure.
+- Affichage des noms et icônes originaux par le catalogue embarqué.
+- Simulation explicite via « + Simuler une récolte » ; aucune lecture en jeu.
+- Sessions fictives isolées dans `gathering_demo.sqlite3` sous le répertoire
+  applicatif utilisateur ; les futures données réelles devront utiliser
+  une base séparée.
+- Tests UI : `python -m unittest tests/test_gathering_page.py -v`
+  (PySide6 et ressources embarquées nécessaires).
 
 ## Contrat d'entrée (exemple sans capture)
 
@@ -50,7 +60,7 @@ with GatheringStore(Path.home() / "SamiAlbionManager" / "gathering.db") as store
 ## À faire
 
 1. Définir la source de données autorisée (validation avec Sandbox Interactive).
-2. Ajouter une interface « Récolte » en PySide6 utilisant la base locale.
+2. Tester visuellement la page « Récolte » et ses commandes sur Windows.
 3. Ajouter filtres par type, tier, enchantement et session, puis valeurs marché.
 4. Créer ensuite le tableau de bord synthétique à partir des mêmes sessions.
 
